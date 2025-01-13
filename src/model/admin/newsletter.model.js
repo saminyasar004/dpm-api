@@ -1,7 +1,7 @@
 const { sequelize } = require("../../config/database.config");
 const { DataTypes } = require("sequelize");
 
-// Define the User model
+// Define the Newsletter model
 const Newsletter = sequelize.define(
 	"Newsletter",
 	{
