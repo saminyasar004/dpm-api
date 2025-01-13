@@ -1,13 +1,11 @@
 require("dotenv").config();
-const url = require("url");
+const urlJoin = require("url-join");
 
 const nodeEnv = process.env.NODE_ENV || "development";
-const serverBaseUrl = url
-	.resolve(
-		"",
-		`${process.env.SERVER_BASE_URL}:${process.env.SERVER_PORT}`.toString()
-	)
-	.slice(0, -1);
+const serverBaseUrl = urlJoin(
+	`${process.env.SERVER_BASE_URL}:${process.env.SERVER_PORT}`
+);
+
 const serverUrlPrefix = process.env.SERVER_URL_PREFIX;
 const port = process.env.SERVER_PORT || 3000;
 const apiDocsUrl = process.env.API_DOCS_URL;
