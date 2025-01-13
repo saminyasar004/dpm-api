@@ -1,7 +1,7 @@
 require("colors");
 const http = require("http");
 const app = require("./app/app");
-const url = require("url");
+const urlJoin = require("url-join");
 const { port, apiDocsUrl, serverBaseUrl } = require("./config/dotenv.config");
 const { initializeDatabase } = require("./config/database.config");
 
@@ -17,7 +17,7 @@ const server = http.createServer(app);
 			server.listen(port, () => {
 				console.log(`Server is running on ${serverBaseUrl}`.yellow);
 				console.log(
-					`API Docs: ${url.resolve(serverBaseUrl, apiDocsUrl)}`.blue
+					`API Docs: ${urlJoin(serverBaseUrl, apiDocsUrl)}`.blue
 				);
 			});
 		} catch (err) {
