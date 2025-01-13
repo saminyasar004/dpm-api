@@ -98,4 +98,25 @@ newsletterService.findByEmail = async (email) => {
 	}
 };
 
+/**
+ * get all subscribers
+ *
+ * @returns {Promise<Newsletter[]>}
+ */
+newsletterService.getAll = async () => {
+	try {
+		const newsletters = await Newsletter.findAll();
+		if (newsletters) {
+			return newsletters.map((newsletter) => newsletter.toJSON());
+		}
+		return null;
+	} catch (err) {
+		console.log(
+			"Error occured while getting all newsletters: ".red,
+			err.message
+		);
+		throw err;
+	}
+};
+
 module.exports = newsletterService;

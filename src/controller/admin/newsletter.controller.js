@@ -35,7 +35,6 @@ newsletterController.subscribe = async (req, res, next) => {
 			serverUrlPrefix,
 			`/newsletter/verify?email=${email}&token=${verificationToken}`
 		);
-		console.log(verificationUrl);
 		const unsubscribeUrl = urlJoin(
 			serverBaseUrl,
 			serverUrlPrefix,
@@ -100,6 +99,36 @@ newsletterController.unsubscribe = async (req, res, next) => {
 	} catch (err) {
 		console.log(
 			"Error occured while unsubscribing newsletter: ".red,
+			err.message
+		);
+		next(err);
+	}
+};
+
+newsletterController.getAllSubscriber = async (_req, res, next) => {
+	try {
+		const subscribers = await newsletterService.getAll();
+		if (!subscribers) {
+			return responseSender(res, 400, "No subscribers found.");
+		}
+
+		subscribers.forEach((subscriber) => {
+			subscriber.verificationUrl = urlJoin(
+				serverBaseUrl,
+				serverUrlPrefix,
+				`/newsletter/verify?email=${subscriber.email}&token=${subscriber.verification_token}`
+			);
+			subscriber.unsubscribeUrl = urlJoin(
+				serverBaseUrl,
+				serverUrlPrefix,
+				`/newsletter/unsubscribe?email=${subscriber.email}&token=${subscriber.verification_token}`
+			);
+		});
+
+		return responseSender(res, 200, subscribers);
+	} catch (err) {
+		console.log(
+			"Error occured while getting all subscribers: ".red,
 			err.message
 		);
 		next(err);

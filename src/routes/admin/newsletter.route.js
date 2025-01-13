@@ -10,6 +10,8 @@ const newsletterRouter = express.Router();
 
 newsletterRouter.use(apiLimiter);
 
+newsletterRouter.get("/", newsletterController.getAllSubscriber);
+
 newsletterRouter.post(
 	"/subscribe",
 	strictLimiter,
