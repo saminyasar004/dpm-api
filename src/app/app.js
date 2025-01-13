@@ -12,6 +12,7 @@ const { responseSender } = require("../util/index");
 const notFoundController = require("../controller/notFound.controller");
 const errorController = require("../controller/error.controller");
 const userRouter = require("../routes/admin/user.route");
+const newsletterRouter = require("../routes/admin/newsletter.route");
 
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpecs = require("../config/swagger.config");
@@ -50,6 +51,9 @@ app.get(`${serverUrlPrefix}/health`, (_req, res) => {
 
 // user routes
 app.use(`${serverUrlPrefix}/user`, userRouter);
+
+// newsletter routes
+app.use(`${serverUrlPrefix}/newsletter`, newsletterRouter);
 
 // 404 middleware
 app.use(notFoundController);
