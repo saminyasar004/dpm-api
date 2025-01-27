@@ -14,11 +14,11 @@
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
 		"baseUrl": "./",
-		"typeRoots": ["./node_modules/@types", "src/types"],
+		"typeRoots": ["./node_modules/@types", "./src/types"],
 		"paths": {
 			"@/*": ["src/*"]
 		}
 	},
-	"include": ["src/**/*", "src/types/**/*.d.ts"],
+	"include": ["./src/**/*", "./src/types/**/*.d.ts"],
 	"exclude": ["node_modules", "dist"]
 }
