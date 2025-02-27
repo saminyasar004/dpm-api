@@ -1,9 +1,4 @@
-import {
-	responseSender,
-	hashedPassword,
-	comparePassword,
-	generateJWTToken,
-} from "@/util";
+import { responseSender, hashedPassword, comparePassword } from "@/util";
 import { Request, Response, NextFunction } from "express";
 import AdminService from "@/service/admin.service";
 import fs from "fs";
@@ -15,89 +10,6 @@ class AdminController {
 	constructor() {
 		this.adminService = new AdminService();
 	}
-
-	registerAdmin = async (req: Request, res: Response, next: NextFunction) => {
-		try {
-			const admin = {
-				name: (req as any).validatedValue.name,
-				email: (req as any).validatedValue.email,
-				password: await hashedPassword(
-					(req as any).validatedValue.password,
-				),
-			};
-
-			// check if the there is already an admin registered
-			const isAdminExists = await this.adminService.getAllAdmin();
-			if (isAdminExists && isAdminExists.length > 0) {
-				return responseSender(
-					res,
-					400,
-					"Admin already exists. Please login.",
-				);
-			}
-
-			const createdAdmin = await this.adminService.registerAdmin(
-				admin.name,
-				admin.email,
-				admin.password,
-			);
-			if (!createdAdmin) {
-				return responseSender(
-					res,
-					400,
-					"Admin registration failed. Please try again.",
-				);
-			}
-			// create jwt token
-			const { password, ...authTokenPayload } = createdAdmin;
-			const authToken = generateJWTToken(authTokenPayload);
-
-			return responseSender(res, 201, "Admin registered successfully.", {
-				admin: authTokenPayload,
-				authToken,
-			});
-		} catch (err: any) {
-			console.log("Error occured in admin controller: ".red, err.message);
-			next(err);
-		}
-	};
-
-	loginAdmin = async (req: Request, res: Response, next: NextFunction) => {
-		try {
-			const fetchedAdmin = await this.adminService.getAdminByEmail(
-				(req as any).validatedValue.email,
-			);
-			if (!fetchedAdmin) {
-				return responseSender(
-					res,
-					400,
-					"Admin not found. Please register.",
-				);
-			}
-			const isPasswordValid = await comparePassword(
-				(req as any).validatedValue.password,
-				fetchedAdmin.password,
-			);
-			if (!isPasswordValid) {
-				return responseSender(
-					res,
-					400,
-					"Invalid password. Please try again.",
-				);
-			}
-			// create jwt token
-			const { password, ...authTokenPayload } = fetchedAdmin;
-			const authToken = generateJWTToken(authTokenPayload);
-
-			return responseSender(res, 200, "Admin logged in successfully.", {
-				admin: authTokenPayload,
-				authToken,
-			});
-		} catch (err: any) {
-			console.log("Error occured in admin controller: ".red, err.message);
-			next(err);
-		}
-	};
 
 	uploadAdminAvatar = async (
 		req: Request,
@@ -175,8 +87,12 @@ class AdminController {
 
 	updateAdmin = async (req: Request, res: Response, next: NextFunction) => {
 		try {
+			const fileValidationError = (req as any).fileValidationError;
+			if (fileValidationError) {
+				return responseSender(res, 400, fileValidationError);
+			}
+
 			const authorizedAdmin = (req as any).admin;
-			console.log(authorizedAdmin);
 
 			const fetchedAdmin = await this.adminService.getAdminByEmail(
 				authorizedAdmin?.email,
@@ -193,6 +109,22 @@ class AdminController {
 				fetchedAdmin.password,
 			);
 			if (!isPasswordValid) {
+				// since password didn't match so delete the uploaded file
+				if (req.file) {
+					const filePath = path.join(
+						req.file.destination,
+						req.file.filename,
+					);
+
+					fs.unlink(filePath, (unlinkErr) => {
+						if (unlinkErr)
+							console.log(
+								"Error deleting uploaded file: ".red,
+								unlinkErr.message,
+							);
+					});
+				}
+
 				return responseSender(
 					res,
 					400,
@@ -200,10 +132,48 @@ class AdminController {
 				);
 			}
 
+			// if the admin has previous avatar then remove it
+			if (
+				fetchedAdmin.avatar !== "null" &&
+				(req as any).validatedValue.keepPreviousAvatar === "false"
+			) {
+				const filePath = path.join(
+					__dirname,
+					"../../public/avatars",
+					fetchedAdmin.avatar,
+				);
+
+				fs.unlink(filePath, (unlinkErr) => {
+					if (unlinkErr)
+						console.log(
+							"Error deleting previous avatar of admin: ".red,
+							unlinkErr.message,
+						);
+				});
+			}
+
+			const updatedAdminProps = {
+				email: fetchedAdmin.email,
+				name: (req as any).validatedValue.name,
+				phone: (req as any).validatedValue.phone,
+				avatar:
+					(req as any).validatedValue.keepPreviousAvatar === "true"
+						? fetchedAdmin.avatar
+						: (req.file && req.file.filename) || "null",
+				password:
+					(req as any).validatedValue.newPassword.length > 0
+						? await hashedPassword(
+								(req as any).validatedValue.newPassword,
+							)
+						: undefined,
+			};
+
 			const isUpdated = await this.adminService.updateAdmin(
-				fetchedAdmin.email,
-				(req as any).validatedValue.name,
-				await hashedPassword((req as any).validatedValue.newPassword),
+				updatedAdminProps.email,
+				updatedAdminProps.name,
+				updatedAdminProps.phone,
+				updatedAdminProps.avatar,
+				updatedAdminProps.password,
 			);
 			if (!isUpdated) {
 				return responseSender(res, 400, "Admin update failed.");
@@ -211,6 +181,22 @@ class AdminController {
 
 			return responseSender(res, 200, "Admin updated successfully.");
 		} catch (err: any) {
+			// If database operation fails, delete the uploaded file
+			if (req.file) {
+				const filePath = path.join(
+					req.file.destination,
+					req.file.filename,
+				);
+
+				fs.unlink(filePath, (unlinkErr) => {
+					if (unlinkErr)
+						console.log(
+							"Error deleting uploaded file: ".red,
+							unlinkErr.message,
+						);
+				});
+			}
+
 			console.log("Error occured in admin controller: ".red, err.message);
 			next(err);
 		}

@@ -2,8 +2,8 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import sharp from "sharp";
+import sizeof from "image-size";
 import { v4 as uuid } from "uuid";
-import { responseSender } from "@/util";
 import { Request, Response, NextFunction } from "express";
 
 class ImageUploaderMiddleware {
@@ -65,16 +65,35 @@ class ImageUploaderMiddleware {
 	compressImage = async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			if (!req.file || (req as any).fileValidationError) {
-				// return responseSender(
-				// 	res,
-				// 	400,
-				// 	(req as any).fileValidationError ||
-				// 		"No file uploaded.",
-				// );
 				return next();
 			}
 
 			const filePath = req.file.path;
+			const imageDimension = sizeof(filePath);
+			const { width: originalWidth, height: originalHeight } =
+				imageDimension;
+
+			// Define maximum dimensions (e.g., 1000px for width or height)
+			const MAX_DIMENSION = 1000;
+
+			if (!originalHeight || !originalWidth) {
+				return;
+			}
+
+			// Calculate new dimensions while maintaining aspect ratio
+			let targetWidth, targetHeight;
+			if (originalWidth > originalHeight) {
+				targetWidth = MAX_DIMENSION;
+				targetHeight = Math.round(
+					(originalHeight / originalWidth) * MAX_DIMENSION,
+				);
+			} else {
+				targetHeight = MAX_DIMENSION;
+				targetWidth = Math.round(
+					(originalWidth / originalHeight) * MAX_DIMENSION,
+				);
+			}
+
 			const compressedPath = filePath.replace(
 				/(\.\w+)$/,
 				`-${Math.ceil(Math.random() * 100000)}$1`,
@@ -82,20 +101,93 @@ class ImageUploaderMiddleware {
 
 			try {
 				await sharp(filePath)
-					.resize({ width: 1000 })
-					.jpeg({ quality: 80 })
+					.resize(targetWidth, targetHeight, {
+						fit: "inside", // Maintain aspect ratio without cropping
+						withoutEnlargement: true, // Prevent enlarging images smaller than MAX_DIMENSION
+					})
+					.jpeg({ quality: 95 }) // Adjust quality as needed
 					.toFile(compressedPath);
 
 				// Replace the original file path with the compressed file path
-				fs.unlinkSync(filePath); // Remove the uncompressed file
+				fs.unlinkSync(filePath); // Remove uncompressed file
 				req.file.path = compressedPath;
 				req.file.filename = path.basename(compressedPath);
-
-				next();
 			} catch (err: any) {
 				console.log("Error compressing image: ".red, err.message);
-				next(err);
 			}
+		} catch (err) {
+			next(err);
+		}
+	};
+
+	compressImages = async (
+		req: Request,
+		res: Response,
+		next: NextFunction,
+	) => {
+		try {
+			if (!req.files || (req as any).fileValidationError) {
+				return next();
+			}
+
+			const files = req.files as Express.Multer.File[];
+
+			await Promise.all(
+				files.map(async (file) => {
+					const filePath = file.path;
+					const imageDimension = sizeof(filePath);
+					const { width: originalWidth, height: originalHeight } =
+						imageDimension;
+
+					// Define maximum dimensions (e.g., 1000px for width or height)
+					const MAX_DIMENSION = 1000;
+
+					if (!originalHeight || !originalWidth) {
+						return;
+					}
+
+					// Calculate new dimensions while maintaining aspect ratio
+					let targetWidth, targetHeight;
+					if (originalWidth > originalHeight) {
+						targetWidth = MAX_DIMENSION;
+						targetHeight = Math.round(
+							(originalHeight / originalWidth) * MAX_DIMENSION,
+						);
+					} else {
+						targetHeight = MAX_DIMENSION;
+						targetWidth = Math.round(
+							(originalWidth / originalHeight) * MAX_DIMENSION,
+						);
+					}
+
+					const compressedPath = filePath.replace(
+						/(\.\w+)$/,
+						`-${Math.ceil(Math.random() * 100000)}$1`,
+					);
+
+					try {
+						await sharp(filePath)
+							.resize(targetWidth, targetHeight, {
+								fit: "inside", // Maintain aspect ratio without cropping
+								withoutEnlargement: true, // Prevent enlarging images smaller than MAX_DIMENSION
+							})
+							.jpeg({ quality: 95 }) // Adjust quality as needed
+							.toFile(compressedPath);
+
+						// Replace the original file path with the compressed file path
+						fs.unlinkSync(filePath); // Remove uncompressed file
+						file.path = compressedPath;
+						file.filename = path.basename(compressedPath);
+					} catch (err: any) {
+						console.log(
+							"Error compressing image: ".red,
+							err.message,
+						);
+					}
+				}),
+			);
+
+			next();
 		} catch (err) {
 			next(err);
 		}

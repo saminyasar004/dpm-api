@@ -32,28 +32,28 @@ class Otp extends Model<OtpAttributes, OtpCreationAttributes> {
 	@PrimaryKey
 	@AutoIncrement
 	@Column(DataType.INTEGER)
-	OtpId!: number;
+	declare OtpId: number;
 
 	@Column(DataType.INTEGER)
-	requestId!: number;
+	declare requestId: number;
 
 	@Column({
 		type: DataType.STRING,
 		allowNull: false,
 	})
-	code!: string;
+	declare code: string;
 
 	@Column({
 		type: DataType.DATE,
 		allowNull: false,
 	})
-	expiresAt!: Date;
+	declare expiresAt: Date;
 
 	@Column({
 		type: DataType.BOOLEAN,
 		defaultValue: false,
 	})
-	used!: boolean;
+	declare used: boolean;
 }
 
 export default Otp;

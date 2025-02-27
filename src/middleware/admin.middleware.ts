@@ -6,28 +6,38 @@ class AdminMiddleware {
 	private schema: {
 		name: Joi.StringSchema;
 		email: Joi.StringSchema;
+		phone: Joi.StringSchema;
 		password: Joi.StringSchema;
 	};
 
 	constructor() {
 		this.schema = {
 			name: Joi.string().trim().min(2).required().messages({
-				"string.base": "Name must be a string.",
-				"string.empty": "Name cannot be empty.",
-				"string.min": "Name must be at least 2 characters long.",
-				"any.required": "Name is required.",
+				"string.base": "name must be a string.",
+				"string.empty": "name cannot be empty.",
+				"string.min": "name must be at least 2 characters long.",
+				"any.required": "name is required.",
 			}),
 			email: Joi.string().trim().email().required().messages({
-				"string.base": "Email must be a string.",
-				"string.email": "Invalid email address.",
-				"string.empty": "Email cannot be empty.",
-				"any.required": "Email is required.",
+				"string.base": "email must be a string.",
+				"string.email": "invalid email address.",
+				"string.empty": "email cannot be empty.",
+				"any.required": "email is required.",
 			}),
+			phone: Joi.string()
+				.trim()
+				.required()
+				.pattern(/^01[3-9][0-9]{8}$/)
+				.messages({
+					"string.pattern.base":
+						"phone number must be a valid Bangladeshi number starting with 01 and 11 digits long.",
+					"string.empty": "phone number cannot be empty.",
+				}),
 			password: Joi.string().trim().min(8).required().messages({
-				"string.base": "Password must be a string.",
-				"string.empty": "Password cannot be empty.",
-				"string.min": "Password must be at least 8 characters long.",
-				"any.required": "Password is required.",
+				"string.base": "password must be a string.",
+				"string.empty": "password cannot be empty.",
+				"string.min": "password must be at least 8 characters long.",
+				"any.required": "password is required.",
 			}),
 		};
 	}
@@ -98,11 +108,22 @@ class AdminMiddleware {
 					"any.required": "Current password is required.",
 					"string.empty": "Current password cannot be empty.",
 				}),
-				newPassword: this.schema.password.messages({
-					"string.base": "New password must be a string.",
-					"any.required": "New password is required.",
-					"string.empty": "New password cannot be empty.",
-				}),
+				newPassword: this.schema.password
+					.optional()
+					.allow("")
+					.messages({
+						"string.base": "New password must be a string.",
+					}),
+				phone: this.schema.phone,
+				keepPreviousAvatar: Joi.string()
+					.trim()
+					.optional()
+					.valid("true", "false")
+					.messages({
+						"string.base": "keepPreviousAvatar must be a string.",
+						"any.required":
+							"keepPreviousAvatar must be either true or false",
+					}),
 			});
 
 			const validationResult = adminSchema.validate(req.body, {

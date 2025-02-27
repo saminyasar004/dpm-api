@@ -41,6 +41,8 @@ export const strictRateLimitMax: string =
 
 export const apiWhitelistedDomains: string[] =
 	process.env.API_WHITELISTED_DOMAINS?.split(" ") || [];
+export const frontendLandingPageUrl: string =
+	process.env.FRONTEND_LANDING_PAGE_URL || "";
 
 export const jwtSecret: string = process.env.JWT_SECRET || "";
 export const jwtExpiresIn: string = process.env.JWT_EXPIRES_IN || "1d";

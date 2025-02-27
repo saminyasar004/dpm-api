@@ -1,4 +1,5 @@
 import Otp, { OtpAttributes } from "@/model/otp.model";
+import { Op } from "sequelize";
 
 class OtpService {
 	public config: {
@@ -51,6 +52,22 @@ class OtpService {
 		} catch (err: any) {
 			console.log("Error occured while verifying otp: ".red, err.message);
 			throw err;
+		}
+	};
+
+	static cleanupExpiredOtps = async () => {
+		try {
+			const now = new Date();
+			await Otp.destroy({
+				where: {
+					expiresAt: {
+						[Op.lt]: now,
+					},
+				},
+			});
+			console.log("Expired OTPs cleaned up successfully.".green);
+		} catch (error) {
+			console.log("Error cleaning up expired OTPs: ".red, error);
 		}
 	};
 }

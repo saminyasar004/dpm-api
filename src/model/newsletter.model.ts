@@ -33,25 +33,25 @@ class Newsletter extends Model<
 	@PrimaryKey
 	@AutoIncrement
 	@Column(DataType.INTEGER)
-	newsletterId!: number;
+	declare newsletterId: number;
 
 	@Column({
 		type: DataType.STRING,
 		allowNull: false,
 	})
-	email!: string;
+	declare email: string;
 
 	@Column({
 		type: DataType.BOOLEAN,
 		allowNull: false,
 	})
-	verified!: boolean;
+	declare verified: boolean;
 
 	@Column({
 		type: DataType.STRING,
 		allowNull: false,
 	})
-	verificationToken!: string;
+	declare verificationToken: string;
 }
 
 export default Newsletter;

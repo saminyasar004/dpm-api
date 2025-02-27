@@ -4,6 +4,7 @@ class AdminService {
 	registerAdmin = async (
 		name: string,
 		email: string,
+		phone: string,
 		password: string,
 	): Promise<Admin | AdminAttributes | null> => {
 		try {
@@ -11,6 +12,7 @@ class AdminService {
 				{
 					name,
 					email,
+					phone,
 					password,
 				},
 				{ returning: true },
@@ -87,7 +89,9 @@ class AdminService {
 	updateAdmin = async (
 		email: string,
 		name: string,
-		password: string,
+		phone: string,
+		avatar: string,
+		password?: string,
 	): Promise<boolean> => {
 		try {
 			const prevTokenVersion = (await Admin.findOne({
@@ -98,6 +102,8 @@ class AdminService {
 				{
 					name,
 					password,
+					phone,
+					avatar,
 					tokenVersion: prevTokenVersion.tokenVersion + 1,
 				},
 				{

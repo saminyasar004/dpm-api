@@ -6,6 +6,7 @@ import path from "path";
 import ejs from "ejs";
 import { jwtSecret, jwtExpiresIn } from "@/config/dotenv.config";
 import { Response } from "express";
+import slugify from "slugify";
 
 export const responseSender = (
 	res: Response,
@@ -98,4 +99,8 @@ export const loadTemplate = async (templateName: string, variables: {}) => {
 		);
 		console.log(err.message);
 	}
+};
+
+export const createSlug = (str: string) => {
+	return slugify(str, { lower: true });
 };

@@ -1,15 +1,19 @@
 import NewsletterService from "@/service/newsletter.service";
+import EmailService from "@/service/email.service";
 import { responseSender, generateVerificationToken } from "@/util";
 import urlJoin from "url-join";
 import { Op, Order, WhereOptions } from "sequelize";
 import { serverBaseUrl, serverUrlPrefix } from "@/config/dotenv.config";
 import { Request, Response, NextFunction } from "express";
 import { NewsletterAttributes } from "@/model/newsletter.model";
+import { io } from "@/server";
 
 class NewsletterController {
 	private newsletterService: NewsletterService;
+	private emailService: EmailService;
 	constructor() {
 		this.newsletterService = new NewsletterService();
+		this.emailService = new EmailService();
 	}
 
 	subscribe = async (req: Request, res: Response, next: NextFunction) => {
@@ -34,25 +38,45 @@ class NewsletterController {
 					"Something went wrong. Please try again.",
 				);
 			}
-			const verificationUrl = urlJoin(
-				serverBaseUrl,
-				serverUrlPrefix,
-				`/newsletter/verify?email=${email}&token=${verificationToken}`,
-			);
-			const unsubscribeUrl = urlJoin(
-				serverBaseUrl,
-				serverUrlPrefix,
-				`/newsletter/unsubscribe?email=${email}&token=${verificationToken}`,
-			);
-			return responseSender(
-				res,
-				200,
-				"You have subscribed successfully.",
-				{
-					verificationUrl,
-					unsubscribeUrl,
-				},
-			);
+
+			try {
+				const verificationUrl = urlJoin(
+					serverBaseUrl,
+					serverUrlPrefix,
+					`/newsletter/verify?email=${email}&token=${verificationToken}`,
+				);
+				const unsubscribeUrl = urlJoin(
+					serverBaseUrl,
+					serverUrlPrefix,
+					`/newsletter/unsubscribe?email=${email}&token=${verificationToken}`,
+				);
+				// send welcome email
+				await this.emailService.sendEmail(
+					email,
+					"Welcome to Dhaka Plastic & Metal Newsletter",
+					"newsletter-subscribe",
+					{ email, verificationUrl, unsubscribeUrl },
+				);
+
+				// emit the subscribe newsletter event
+				io.emit("subscribe-newsletter");
+
+				return responseSender(
+					res,
+					200,
+					"You have subscribed successfully.",
+				);
+			} catch (err: any) {
+				console.log(
+					"Error occured while sending welcome subscription email: "
+						.red,
+					err.message,
+				);
+				// clean up the database
+				await this.newsletterService.deleteByEmail(email);
+
+				next(err);
+			}
 		} catch (err: any) {
 			console.log(
 				"Error occured while subscribing newsletter: ".red,
@@ -192,6 +216,42 @@ class NewsletterController {
 		} catch (err: any) {
 			console.log(
 				"Error occured while getting all subscribers: ".red,
+				err.message,
+			);
+			next(err);
+		}
+	};
+
+	deleteByEmail = async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const email = (req as any).validatedValue.email;
+
+			const isEmailExists =
+				await this.newsletterService.findByEmail(email);
+			if (!isEmailExists) {
+				return responseSender(
+					res,
+					400,
+					"Email record could not found.",
+				);
+			}
+
+			const isDeleted = await this.newsletterService.deleteByEmail(email);
+			if (!isDeleted) {
+				return responseSender(
+					res,
+					400,
+					"Someting went wrong. Please try again.",
+				);
+			}
+			return responseSender(
+				res,
+				200,
+				"Email record deleted successfully.",
+			);
+		} catch (err: any) {
+			console.log(
+				"Error occured while deleting a record from newsletter: ".red,
 				err.message,
 			);
 			next(err);

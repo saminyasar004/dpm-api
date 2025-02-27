@@ -2,7 +2,7 @@ import express from "express";
 import AuthMiddleware from "@/middleware/auth.middleware";
 import InqueryMiddleware from "@/middleware/inquery.middleware";
 import InqueryController from "@/controller/inquery.controller";
-import { apiLimiter } from "@/middleware/rateLimiter.middleware";
+import { apiLimiter, strictLimiter } from "@/middleware/rateLimiter.middleware";
 import ImageUploaderMiddleware from "@/middleware/imageUploader.middleware";
 
 const authMiddleware = new AuthMiddleware();
@@ -12,28 +12,44 @@ const inqueryImageUploader = new ImageUploaderMiddleware();
 
 const inqueryRouter = express.Router();
 
-inqueryRouter.use(apiLimiter);
-
 inqueryRouter.get(
 	"/",
-	authMiddleware.authenticate(["admin"]),
+	authMiddleware.authenticate(["admin", "agent", "designer"]),
 	inqueryMiddleware.validateFilteringQueries,
 	inqueryController.getAllInqueries,
 );
 
 inqueryRouter.post(
 	"/create-inquery",
-	inqueryImageUploader.uploader("inqueries").single("designFile"),
-	inqueryImageUploader.compressImage,
+	strictLimiter,
+	inqueryImageUploader.uploader("inqueries").array("designFiles", 5),
+	inqueryImageUploader.compressImages,
 	inqueryMiddleware.validateInqueryCreation,
 	inqueryController.createInquery,
 );
 
 inqueryRouter.get(
 	"/close",
+	apiLimiter,
 	authMiddleware.authenticate(["admin"]),
-	inqueryMiddleware.validateInqueryClose,
+	inqueryMiddleware.validateInqueryStatusChange,
 	inqueryController.closeInquery,
+);
+
+inqueryRouter.get(
+	"/open",
+	apiLimiter,
+	authMiddleware.authenticate(["admin"]),
+	inqueryMiddleware.validateInqueryStatusChange,
+	inqueryController.openInquery,
+);
+
+inqueryRouter.delete(
+	"/",
+	apiLimiter,
+	authMiddleware.authenticate(["admin"]),
+	inqueryMiddleware.validateInqueryDelete,
+	inqueryController.deleteInquery,
 );
 
 export default inqueryRouter;

@@ -139,7 +139,7 @@ class InqueryMiddleware {
 		}
 	};
 
-	validateInqueryClose = (
+	validateInqueryStatusChange = (
 		req: Request,
 		res: Response,
 		next: NextFunction,
@@ -155,7 +155,8 @@ class InqueryMiddleware {
 			const validationResult = inquerySchema.validate(req.query);
 			if (validationResult.error) {
 				console.log(
-					"Error occures while validating inquery closing: ".red,
+					"Error occures while validating inquery status change operation: "
+						.red,
 					validationResult.error.message,
 				);
 				return responseSender(res, 400, validationResult.error.message);
@@ -166,7 +167,43 @@ class InqueryMiddleware {
 			next();
 		} catch (err: any) {
 			console.log(
-				"Error occures while validating inquery closing: ".red,
+				"Error occures while validating inquery status change operation: "
+					.red,
+				err.message,
+			);
+			next(err);
+		}
+	};
+
+	validateInqueryDelete = (
+		req: Request,
+		res: Response,
+		next: NextFunction,
+	) => {
+		try {
+			const inquerySchema = Joi.object({
+				inqueryId: Joi.number().required().messages({
+					"number.base": "inqueryId must be a integer.",
+					"number.required": "inqueryId is required.",
+				}),
+			});
+
+			const validationResult = inquerySchema.validate(req.body);
+			if (validationResult.error) {
+				console.log(
+					"Error occures while validating inquery delete operation: "
+						.red,
+					validationResult.error.message,
+				);
+				return responseSender(res, 400, validationResult.error.message);
+			}
+
+			// everything is fine
+			(req as any).validatedValue = validationResult.value;
+			next();
+		} catch (err: any) {
+			console.log(
+				"Error occures while validating inquery delete operation: ".red,
 				err.message,
 			);
 			next(err);
@@ -181,17 +218,18 @@ class InqueryMiddleware {
 		try {
 			const inqueryFilteringSchema = Joi.object({
 				searchTerm: Joi.string().trim().optional().messages({
-					"string.base": "search term must be a string.",
-					"string.empty": "search term cannot be empty.",
+					"string.base": "searchTerm must be a string.",
+					"string.empty": "searchTerm cannot be empty.",
 				}),
 				searchBy: Joi.string()
 					.trim()
 					.optional()
-					.valid("name", "email")
+					.valid("name", "email", "phone")
 					.messages({
-						"string.base": "search by must be a string.",
-						"any.valid": "search by should be 'name' or 'email'.",
-						"string.empty": "search by cannot be empty.",
+						"string.base": "searchBy must be a string.",
+						"any.valid":
+							"searchBy should be 'name', 'email' or 'phone'.",
+						"string.empty": "searchBy cannot be empty.",
 					}),
 				inqueryType: Joi.string()
 					.trim()
@@ -203,10 +241,10 @@ class InqueryMiddleware {
 						"others",
 					)
 					.messages({
-						"string.base": "inquery type must be a string.",
-						"string.empty": "inquery type cannot be empty.",
+						"string.base": "inqueryType must be a string.",
+						"string.empty": "inqueryType cannot be empty.",
 						"any.valid":
-							"inquery type should be one of 'product-information', 'pricing', 'customization-options', 'others'",
+							"inqueryType should be one of 'product-information', 'pricing', 'customization-options', 'others'",
 					}),
 				status: Joi.string()
 					.trim()

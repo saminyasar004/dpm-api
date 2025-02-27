@@ -1,12 +1,5 @@
 import { Sequelize } from "sequelize-typescript";
-import {
-	dbHost,
-	dbName,
-	dbUser,
-	dbPassword,
-	nodeEnv,
-	dbConnectionString,
-} from "@/config/dotenv.config";
+import { nodeEnv, dbConnectionString } from "@/config/dotenv.config";
 import path from "path";
 
 export const sequelize = new Sequelize(dbConnectionString, {

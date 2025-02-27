@@ -5,18 +5,17 @@ import {
 	PrimaryKey,
 	AutoIncrement,
 	DataType,
-	AllowNull,
 	ForeignKey,
 	BelongsTo,
 } from "sequelize-typescript";
 
-import Faq from "./faq.model";
+import Faq from "@/model/faq.model";
 
 export interface FaqItemAttributes {
 	faqItemId: number;
-	faqId: number;
 	question: string;
 	answer: string;
+	faqId: number;
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -27,30 +26,25 @@ export interface FaqItemCreationAttributes {
 	answer: string;
 }
 
-@Table({
-	tableName: "FaqItems",
-	timestamps: true,
-})
+@Table({ tableName: "FaqItems", timestamps: true })
 class FaqItem extends Model<FaqItemAttributes, FaqItemCreationAttributes> {
 	@PrimaryKey
 	@AutoIncrement
-	@Column(DataType.INTEGER)
+	@Column({ type: DataType.INTEGER })
 	declare faqItemId: number;
 
-	@ForeignKey(() => Faq) // Foreign key to the Faq model
-	@Column(DataType.INTEGER)
-	declare faqId: number;
-
-	@AllowNull(false)
-	@Column(DataType.STRING)
+	@Column({ type: DataType.STRING, allowNull: false })
 	declare question: string;
 
-	@AllowNull(false)
-	@Column(DataType.TEXT)
+	@Column({ type: DataType.TEXT, allowNull: false })
 	declare answer: string;
 
+	@ForeignKey(() => Faq)
+	@Column({ type: DataType.INTEGER, allowNull: false })
+	declare faqId: number;
+
 	@BelongsTo(() => Faq)
-	declare faq: Faq;
+	declare faq?: Faq;
 }
 
 export default FaqItem;

@@ -4,13 +4,50 @@ import CustomerService from "@/service/customer.service";
 import { responseSender, verifyToken } from "@/util";
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
+import Joi from "joi";
 
 class AuthMiddleware {
-	constructor(
-		private adminService = new AdminService(),
-		private staffService = new StaffService(),
-		private customerService = new CustomerService(),
-	) {}
+	private schema: {
+		name: Joi.StringSchema;
+		email: Joi.StringSchema;
+		phone: Joi.StringSchema;
+		password: Joi.StringSchema;
+	};
+	private adminService = new AdminService();
+	private staffService = new StaffService();
+	private customerService = new CustomerService();
+
+	constructor() {
+		this.schema = {
+			name: Joi.string().trim().min(2).required().messages({
+				"string.base": "name must be a string.",
+				"string.empty": "name cannot be empty.",
+				"string.min": "name must be at least 2 characters long.",
+				"any.required": "name is required.",
+			}),
+			email: Joi.string().trim().email().required().messages({
+				"string.base": "email must be a string.",
+				"string.email": "invalid email address.",
+				"string.empty": "email cannot be empty.",
+				"any.required": "email is required.",
+			}),
+			phone: Joi.string()
+				.trim()
+				.required()
+				.pattern(/^01[3-9][0-9]{8}$/)
+				.messages({
+					"string.pattern.base":
+						"phone number must be a valid Bangladeshi number starting with 01 and 11 digits long.",
+					"string.empty": "phone number cannot be empty.",
+				}),
+			password: Joi.string().trim().min(8).required().messages({
+				"string.base": "password must be a string.",
+				"string.empty": "password cannot be empty.",
+				"string.min": "password must be at least 8 characters long.",
+				"any.required": "password is required.",
+			}),
+		};
+	}
 
 	authenticate = (
 		roles: Array<"customer" | "admin" | "agent" | "designer">,
@@ -42,7 +79,7 @@ class AuthMiddleware {
 					if (!decodedToken) {
 						return responseSender(
 							res,
-							403,
+							401,
 							"Invalid authorization token.",
 						);
 					}
@@ -62,7 +99,7 @@ class AuthMiddleware {
 								) {
 									return responseSender(
 										res,
-										403,
+										401,
 										"Invalid authorization token.",
 									);
 								}
@@ -80,7 +117,7 @@ class AuthMiddleware {
 								) {
 									return responseSender(
 										res,
-										403,
+										401,
 										"Invalid authorization token.",
 									);
 								}
@@ -100,7 +137,7 @@ class AuthMiddleware {
 								) {
 									return responseSender(
 										res,
-										403,
+										401,
 										"Invalid authorization token.",
 									);
 								}
@@ -113,7 +150,7 @@ class AuthMiddleware {
 					if (!user) {
 						return responseSender(
 							res,
-							403,
+							401,
 							"Invalid authorization token.",
 						);
 					}
@@ -127,8 +164,8 @@ class AuthMiddleware {
 					if (err instanceof jwt.JsonWebTokenError) {
 						return responseSender(
 							res,
-							403,
-							"Invalid authorization token.",
+							401,
+							err.message || "Invalid authorization token.",
 						);
 					}
 					next(err);
@@ -141,6 +178,68 @@ class AuthMiddleware {
 				next(err);
 			}
 		};
+	};
+
+	validateAdminRegistration = (
+		req: Request,
+		res: Response,
+		next: NextFunction,
+	): void => {
+		try {
+			const adminSchema = Joi.object({
+				name: this.schema.name,
+				email: this.schema.email,
+				phone: this.schema.phone,
+				password: this.schema.password,
+			});
+
+			const validationResult = adminSchema.validate(req.body);
+			if (validationResult.error) {
+				console.log(
+					"Error occures while validating admin registration: ".red,
+					validationResult.error.message,
+				);
+				return responseSender(res, 400, validationResult.error.message);
+			}
+
+			// everything is fine
+			(req as any).validatedValue = validationResult.value;
+			next();
+		} catch (err: any) {
+			console.log(
+				"Error occures while validating admin registration: ".red,
+				err.message,
+			);
+			next(err);
+		}
+	};
+
+	validateLogin = (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const loginSchema = Joi.object({
+				email: this.schema.email,
+				password: this.schema.password,
+			});
+
+			const validationResult = loginSchema.validate(req.body);
+			if (validationResult.error) {
+				console.log(
+					"Error occures while validating auth login: ".red,
+					validationResult.error.message,
+				);
+				return responseSender(res, 400, validationResult.error.message);
+			}
+
+			// everything is fine
+			(req as any).validatedValue = validationResult.value;
+			next();
+		} catch (err: any) {
+			console.log(
+				"Error occures while validating auth login: ".red,
+				err.message,
+			);
+			next(err);
+		}
 	};
 }
 

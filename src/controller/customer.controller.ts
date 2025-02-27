@@ -1,4 +1,8 @@
-import { serverBaseUrl, serverUrlPrefix } from "@/config/dotenv.config";
+import {
+	frontendLandingPageUrl,
+	serverBaseUrl,
+	serverUrlPrefix,
+} from "@/config/dotenv.config";
 import {
 	responseSender,
 	hashedPassword,
@@ -14,6 +18,7 @@ import OtpService from "@/service/otp.service";
 import { Request, Response, NextFunction } from "express";
 import { Op, Order, WhereOptions } from "sequelize";
 import { CustomerAttributes } from "@/model/customer.model";
+import { io } from "@/server";
 
 class CustomerController {
 	private customerService: CustomerService;
@@ -85,6 +90,10 @@ class CustomerController {
 					"welcome-email",
 					{ name: customer.name, verificationUrl },
 				);
+
+				// emit the new customer join event
+				io.emit("register-customer", { customer: authTokenPayload });
+
 				return responseSender(
 					res,
 					201,
@@ -177,7 +186,7 @@ class CustomerController {
 				return responseSender(
 					res,
 					400,
-					"Customer account not found. Please register.",
+					"Account not found. Please register.",
 				);
 			}
 
@@ -185,7 +194,7 @@ class CustomerController {
 				return responseSender(
 					res,
 					400,
-					"Customer account already verified.",
+					"Your account already verified.",
 				);
 			}
 
@@ -202,6 +211,12 @@ class CustomerController {
 			if (isVerified) {
 				// redirect to the login page
 				// * TODO: Redirect to the home page with a toast message [your account is verified successfully]
+
+				return responseSender(
+					res,
+					200,
+					"Your account verified successfully.",
+				);
 			}
 
 			return responseSender(
@@ -401,6 +416,11 @@ class CustomerController {
 						break;
 					case "email":
 						filter.email = {
+							[Op.like]: `%${searchTerm}%`,
+						};
+						break;
+					case "phone":
+						filter.phone = {
 							[Op.like]: `%${searchTerm}%`,
 						};
 						break;

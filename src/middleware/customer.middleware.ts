@@ -310,17 +310,18 @@ class CustomerMiddleware {
 		try {
 			const customerFilteringSchema = Joi.object({
 				searchTerm: Joi.string().trim().optional().messages({
-					"string.base": "search term must be a string.",
-					"string.empty": "search term cannot be empty.",
+					"string.base": "searchTerm must be a string.",
+					"string.empty": "searchTerm cannot be empty.",
 				}),
 				searchBy: Joi.string()
 					.trim()
 					.optional()
-					.valid("name", "email")
+					.valid("name", "email", "phone")
 					.messages({
-						"string.base": "search by must be a string.",
-						"any.valid": "search by should be 'name' or 'email'.",
-						"string.empty": "search by cannot be empty.",
+						"string.base": "searchBy must be a string.",
+						"any.valid":
+							"searchBy should be 'name', 'email' or 'phone'.",
+						"string.empty": "searchBy cannot be empty.",
 					}),
 				verified: Joi.boolean().optional().messages({
 					"boolean.base": "verified must be a boolean.",

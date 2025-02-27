@@ -10,8 +10,6 @@ const authMiddleware = new AuthMiddleware();
 
 const newsletterRouter = express.Router();
 
-newsletterRouter.use(apiLimiter);
-
 newsletterRouter.get(
 	"/",
 	authMiddleware.authenticate(["admin"]),
@@ -28,14 +26,23 @@ newsletterRouter.post(
 
 newsletterRouter.get(
 	"/verify",
+	apiLimiter,
 	newsletterMiddleware.validateEmailFromQuery,
 	newsletterController.verifyEmail,
 );
 
 newsletterRouter.get(
 	"/unsubscribe",
+	apiLimiter,
 	newsletterMiddleware.validateEmailFromQuery,
 	newsletterController.unsubscribe,
+);
+
+newsletterRouter.delete(
+	"/",
+	apiLimiter,
+	newsletterMiddleware.validateEmailFromBody,
+	newsletterController.deleteByEmail,
 );
 
 export default newsletterRouter;

@@ -4,33 +4,44 @@ import { Request, Response, NextFunction } from "express";
 
 class FaqMiddleware {
 	private schema: {
-		title: Joi.StringSchema;
+		faqTitle: Joi.StringSchema;
 		faqItems: Joi.ArraySchema;
 	};
-	private faqItemsSchema: Joi.ObjectSchema;
+	private faqItemsSchema: {
+		faqItemId?: Joi.NumberSchema;
+		faqId?: Joi.NumberSchema;
+		question?: Joi.StringSchema;
+		answer?: Joi.StringSchema;
+	};
 	constructor() {
-		this.faqItemsSchema = Joi.object({
+		this.faqItemsSchema = {
+			faqItemId: Joi.number().optional().messages({
+				"number.base": "faqItemId must be a number.",
+			}),
+			faqId: Joi.number().optional().messages({
+				"number.base": "faqId must be a number.",
+			}),
 			question: Joi.string().required().messages({
-				"string.base": "Question must be a string.",
-				"string.empty": "Question cannot be empty.",
-				"any.required": "Question is required.",
+				"string.base": "question must be a string.",
+				"string.empty": "question cannot be empty.",
+				"any.required": "question is required.",
 			}),
 			answer: Joi.string().required().messages({
-				"string.base": "Answer must be a string.",
-				"string.empty": "Answer cannot be empty.",
-				"any.required": "Answer is required.",
+				"string.base": "answer must be a string.",
+				"string.empty": "answer cannot be empty.",
+				"any.required": "answer is required.",
 			}),
-		});
+		};
 
 		this.schema = {
-			title: Joi.string().trim().min(5).required().messages({
-				"string.base": "Title must be a string.",
-				"string.empty": "Title cannot be empty.",
-				"string.min": "Title must be at least 5 characters long.",
-				"any.required": "Title is required.",
+			faqTitle: Joi.string().trim().min(5).required().messages({
+				"string.base": "faqTitle must be a string.",
+				"string.empty": "faqTitle cannot be empty.",
+				"string.min": "faqTitle must be at least 5 characters long.",
+				"any.required": "faqTitle is required.",
 			}),
 			faqItems: Joi.array()
-				.items(this.faqItemsSchema)
+				.items(Joi.object(this.faqItemsSchema))
 				.required()
 				.min(1)
 				.messages({
@@ -70,6 +81,79 @@ class FaqMiddleware {
 		} catch (err: any) {
 			console.log(
 				"Error occures while validating the faq: ".red,
+				err.message,
+			);
+			next(err);
+		}
+	};
+
+	validateFaqEdit = (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const faqSchema = Joi.object({
+				...this.schema,
+				faqId: Joi.number().required().messages({
+					"number.base": "faqId must be a number.",
+					"any.required": "faqId is required for updating.",
+				}),
+			});
+
+			const validationResult = faqSchema.validate(req.body);
+
+			if (validationResult.error) {
+				console.log(
+					"Error occures while validating faq edit: ".red,
+					validationResult.error.message,
+				);
+				return responseSender(res, 400, validationResult.error.message);
+			}
+
+			// everything is fine
+			(req as any).validatedValue = validationResult.value;
+			next();
+		} catch (err: any) {
+			console.log(
+				"Error occures while validating faq edit: ".red,
+				err.message,
+			);
+			next(err);
+		}
+	};
+
+	validateFilteringQueries = (
+		req: Request,
+		res: Response,
+		next: NextFunction,
+	) => {
+		try {
+			const faqSchema = Joi.object({
+				searchTerm: Joi.string().trim().optional().messages({
+					"string.base": "searchTerm must be a string.",
+					"string.empty": "searchTerm cannot be empty.",
+				}),
+				page: Joi.number().optional().default(1).messages({
+					"number.base": "page must be a integer.",
+				}),
+				limit: Joi.number().optional().default(20).messages({
+					"number.base": "limit must be a integer.",
+				}),
+			});
+
+			const validationResult = faqSchema.validate(req.query);
+
+			if (validationResult.error) {
+				console.log(
+					"Error occures while validating filtering queries: ".red,
+					validationResult.error.message,
+				);
+				return responseSender(res, 400, validationResult.error.message);
+			}
+
+			// everything is fine
+			(req as any).validatedValue = validationResult.value;
+			next();
+		} catch (err: any) {
+			console.log(
+				"Error occures while validating filtering queries: ".red,
 				err.message,
 			);
 			next(err);

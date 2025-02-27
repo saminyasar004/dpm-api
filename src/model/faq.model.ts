@@ -5,15 +5,14 @@ import {
 	PrimaryKey,
 	AutoIncrement,
 	DataType,
-	AllowNull,
 	HasMany,
 } from "sequelize-typescript";
-import FaqItem, { FaqItemAttributes } from "./faq-item.model";
+import FaqItem from "@/model/faq-item.model";
 
 export interface FaqAttributes {
 	faqId: number;
 	faqTitle: string;
-	faqItems: FaqItem[] | FaqItemAttributes[];
+	faqItems: FaqItem[];
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -22,21 +21,17 @@ export interface FaqCreationAttributes {
 	faqTitle: string;
 }
 
-@Table({
-	tableName: "Faqs",
-	timestamps: true,
-})
+@Table({ tableName: "Faqs", timestamps: true })
 class Faq extends Model<FaqAttributes, FaqCreationAttributes> {
 	@PrimaryKey
 	@AutoIncrement
-	@Column(DataType.INTEGER)
+	@Column({ type: DataType.INTEGER })
 	declare faqId: number;
 
-	@AllowNull(false)
-	@Column(DataType.STRING)
+	@Column({ type: DataType.STRING, allowNull: false })
 	declare faqTitle: string;
 
-	@HasMany(() => FaqItem)
+	@HasMany(() => FaqItem, { as: "faqItems" })
 	declare faqItems: FaqItem[];
 }
 

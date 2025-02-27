@@ -10,8 +10,6 @@ const authMiddleware = new AuthMiddleware();
 
 const customerRouter = express.Router();
 
-customerRouter.use(apiLimiter);
-
 // register customer
 customerRouter.post(
 	"/register",
@@ -24,6 +22,7 @@ customerRouter.post(
 // * TODO: Redirect to the home page with a toast message
 customerRouter.get(
 	"/verify",
+	apiLimiter,
 	customerMiddleware.validateCustomerVerificationQuery,
 	customerController.verifyCustomerAccount,
 );
@@ -63,7 +62,6 @@ customerRouter.post(
 // get all customers
 customerRouter.get(
 	"/",
-	apiLimiter,
 	authMiddleware.authenticate(["admin"]),
 	customerMiddleware.validateFilteringQueries,
 	customerController.getAllCustomers,

@@ -1,8 +1,8 @@
-import { FaqItemAttributes } from "@/model/faq-item.model";
+import { FaqAttributes } from "@/model/faq.model";
 import FaqService from "@/service/faq.service";
 import { responseSender } from "@/util";
 import { Request, Response, NextFunction } from "express";
-import { title } from "process";
+import { Op, WhereOptions } from "sequelize";
 
 class FaqController {
 	private faqService: FaqService;
@@ -11,10 +11,10 @@ class FaqController {
 		this.faqService = new FaqService();
 	}
 
-	addNewFaq = async (req: Request, res: Response, next: NextFunction) => {
+	createNewFaq = async (req: Request, res: Response, next: NextFunction) => {
 		try {
-			const createdFaq = await this.faqService.addNewFaq(
-				(req as any).validatedValue.title,
+			const createdFaq = await this.faqService.createNewFaq(
+				(req as any).validatedValue.faqTitle,
 			);
 
 			if (!createdFaq) {
@@ -27,33 +27,59 @@ class FaqController {
 
 			try {
 				for (const faqItem of (req as any).validatedValue.faqItems) {
-					await this.faqService.addNewFaqItem(
+					await this.faqService.createNewFaqItem(
 						createdFaq.faqId,
 						faqItem.question,
 						faqItem.answer,
 					);
 				}
 
-				const newFaq = {
-					...createdFaq,
-					faqItems: await this.faqService.getAllFaqItems(
-						createdFaq.faqId,
-					),
-				};
+				const newFaq = await this.faqService.getFaqById(
+					createdFaq.faqId,
+				);
 
-				return responseSender(res, 200, "Faq added successfully.", {
+				return responseSender(res, 200, "Faq created successfully.", {
 					faq: newFaq,
 				});
 			} catch (err: any) {
 				console.log(
-					"Error occures while adding new faq in controller: ".red,
+					"Error occures while creating new faq in controller: ".red,
 					err.message,
 				);
 				next(err);
 			}
 		} catch (err: any) {
 			console.log(
-				"Error occures while adding new faq in controller: ".red,
+				"Error occures while creating new faq in controller: ".red,
+				err.message,
+			);
+			next(err);
+		}
+	};
+
+	updateFaq = async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const { faqId, faqTitle, faqItems } = (req as any).validatedValue;
+
+			// Update the faq
+			const isUpdated = await this.faqService.updateFaq(
+				faqId,
+				faqTitle,
+				faqItems,
+			);
+
+			if (!isUpdated) {
+				return responseSender(
+					res,
+					500,
+					"Failed to update faq. Please try again.",
+				);
+			}
+
+			return responseSender(res, 200, "FAQ updated successfully.");
+		} catch (err: any) {
+			console.log(
+				"Error occurred while updating faq in controller: ".red,
 				err.message,
 			);
 			next(err);
@@ -62,7 +88,25 @@ class FaqController {
 
 	getAllFaq = async (req: Request, res: Response, next: NextFunction) => {
 		try {
-			const faqs = (await this.faqService.getAllFaq()) || [];
+			const searchTerm = (req as any).validatedValue.searchTerm;
+			const currentPage = parseInt((req as any).validatedValue.page || 1);
+			const limitPerPage = parseInt(
+				(req as any).validatedValue.limit || 20,
+			);
+			const offset = (currentPage - 1) * limitPerPage;
+			const filter: WhereOptions<FaqAttributes> = {};
+
+			if (searchTerm) {
+				filter.faqTitle = {
+					[Op.like]: `%${searchTerm}%`,
+				};
+			}
+
+			const faqs = await this.faqService.getAllFaq(
+				filter,
+				limitPerPage,
+				offset,
+			);
 
 			if (!faqs) {
 				return responseSender(
@@ -70,11 +114,6 @@ class FaqController {
 					400,
 					"Cannot find faqs. Please try again.",
 				);
-			}
-
-			for (const faq of faqs) {
-				faq.faqItems =
-					(await this.faqService.getAllFaqItems(faq.faqId)) || [];
 			}
 
 			return responseSender(res, 200, "Faq fetched successfully.", {

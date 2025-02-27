@@ -8,7 +8,7 @@ import {
 	AllowNull,
 	ForeignKey,
 } from "sequelize-typescript";
-import TestimonialCategory from "./testimonial-category.model";
+import TestimonialCategory from "@/model/testimonial-category.model";
 
 export interface TestimonialAttributes {
 	testimonialId: number;

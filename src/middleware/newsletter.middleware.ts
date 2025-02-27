@@ -10,15 +10,15 @@ class NewsletterMiddleware {
 	constructor() {
 		this.schema = {
 			email: Joi.string().trim().email().required().messages({
-				"string.base": "Email must be a string.",
-				"string.email": "Invalid email address.",
-				"string.empty": "Email cannot be empty.",
-				"any.required": "Email is required.",
+				"string.base": "email must be a string.",
+				"string.email": "invalid email address.",
+				"string.empty": "email cannot be empty.",
+				"any.required": "email is required.",
 			}),
 			token: Joi.string().trim().required().messages({
-				"string.base": "Token must be a string.",
-				"string.empty": "Token cannot be empty.",
-				"any.required": "Token is required.",
+				"string.base": "token must be a string.",
+				"string.empty": "token cannot be empty.",
+				"any.required": "token is required.",
 			}),
 		};
 	}

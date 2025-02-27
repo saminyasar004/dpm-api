@@ -6,17 +6,22 @@ import {
 	PrimaryKey,
 	AutoIncrement,
 	Default,
+	HasMany,
 } from "sequelize-typescript";
+import Order from "./order.model";
 
 export interface StaffAttributes {
 	staffId: number;
 	name: string;
 	email: string;
+	phone: string;
 	password: string;
 	role: "agent" | "designer";
 	commissionPercentage: number;
 	avatar: string;
 	tokenVersion: number;
+	status: "online" | "offline";
+	orders: Order[];
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -24,6 +29,7 @@ export interface StaffAttributes {
 export interface StaffCreationAttributes {
 	name: string;
 	email: string;
+	phone: string;
 	password: string;
 	role: "agent" | "designer";
 	commissionPercentage: number;
@@ -37,49 +43,65 @@ class Staff extends Model<StaffAttributes, StaffCreationAttributes> {
 	@PrimaryKey
 	@AutoIncrement
 	@Column(DataType.INTEGER)
-	staffId!: number;
+	declare staffId: number;
 
 	@Column({
 		type: DataType.STRING,
 		allowNull: false,
 	})
-	name!: string;
+	declare name: string;
 
 	@Column({
 		type: DataType.STRING,
 		allowNull: false,
 	})
-	email!: string;
+	declare email: string;
 
 	@Column({
 		type: DataType.STRING,
 		allowNull: false,
 	})
-	password!: string;
+	declare phone: string;
+
+	@Column({
+		type: DataType.STRING,
+		allowNull: false,
+	})
+	declare password: string;
 
 	@Column({
 		type: DataType.ENUM("agent", "designer"), // Define ENUM values
 		defaultValue: "agent",
 		allowNull: false,
 	})
-	role!: "agent" | "designer";
+	declare role: "agent" | "designer";
 
 	@Column({
 		type: DataType.INTEGER,
 		allowNull: false,
 	})
-	commissionPercentage!: number;
+	declare commissionPercentage: number;
 
 	@Default("null")
 	@Column({
 		type: DataType.STRING,
 		allowNull: false,
 	})
-	avatar!: string;
+	declare avatar: string;
 
 	@Default(0)
 	@Column(DataType.INTEGER)
 	declare tokenVersion: number;
+
+	@Default("offline")
+	@Column({
+		type: DataType.ENUM("online", "offline"),
+		allowNull: false,
+	})
+	declare status: "online" | "offline";
+
+	@HasMany(() => Order)
+	declare orders: Order[];
 }
 
 export default Staff;

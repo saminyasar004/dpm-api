@@ -5,6 +5,7 @@ import { Op, Order, WhereOptions } from "sequelize";
 import { Request, Response, NextFunction } from "express";
 import path from "path";
 import fs from "fs";
+import { io } from "@/server";
 
 class InqueryController {
 	private inqueryService: InqueryService;
@@ -21,7 +22,9 @@ class InqueryController {
 			}
 
 			const newInquery = (req as any).validatedValue;
-			newInquery.designFile = (req.file && req.file.filename) || "null";
+			if (req.files && (req.files as Express.Multer.File[]).length > 0) {
+				newInquery.images = req.files;
+			}
 			const inquery = await this.inqueryService.createInquery(
 				newInquery.name,
 				newInquery.email,
@@ -29,7 +32,6 @@ class InqueryController {
 				newInquery.company,
 				newInquery.inqueryType,
 				newInquery.message,
-				newInquery.designFile,
 			);
 
 			if (!inquery) {
@@ -40,23 +42,36 @@ class InqueryController {
 				);
 			}
 
+			// if inquery images exist then store them
+			if (newInquery.images.length > 0) {
+				for (const image of newInquery.images) {
+					await this.inqueryService.addInqueryImage(
+						image.filename,
+						inquery?.inqueryId,
+					);
+				}
+			}
+
+			// emit the create inquery event
+			io.emit("create-inquery", { inquery });
+
 			return responseSender(res, 200, "Inquery created successfully.", {
 				inquery,
 			});
 		} catch (err: any) {
-			// If database operation fails, delete the uploaded file
-			if (req.file) {
-				const filePath = path.join(
-					req.file.destination,
-					req.file.filename,
-				);
+			// cleanup process if database operation failed
+			if (req.files && Array.isArray(req.files)) {
+				req.files.forEach((file) => {
+					const filePath = path.join(file.destination, file.filename);
 
-				fs.unlink(filePath, (unlinkErr) => {
-					if (unlinkErr)
-						console.log(
-							"Error deleting uploaded file: ".red,
-							unlinkErr.message,
-						);
+					fs.unlink(filePath, (unlinkErr) => {
+						if (unlinkErr) {
+							console.log(
+								"Error deleting uploaded file: ".red,
+								unlinkErr.message,
+							);
+						}
+					});
 				});
 			}
 
@@ -103,6 +118,11 @@ class InqueryController {
 						break;
 					case "email":
 						filter.email = {
+							[Op.like]: `%${searchTerm}%`,
+						};
+						break;
+					case "phone":
+						filter.phone = {
 							[Op.like]: `%${searchTerm}%`,
 						};
 						break;
@@ -153,6 +173,78 @@ class InqueryController {
 		} catch (err: any) {
 			console.log(
 				"Error occured while closing inquery: ".red,
+				err.message,
+			);
+			next(err);
+		}
+	};
+
+	openInquery = async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const inquery = await this.inqueryService.openInquery(
+				(req as any).validatedValue.inqueryId,
+			);
+
+			if (!inquery) {
+				return responseSender(
+					res,
+					400,
+					"Failed to open inquery. Please try again.",
+				);
+			}
+			return responseSender(res, 200, "Inquery opened successfully.");
+		} catch (err: any) {
+			console.log(
+				"Error occured while opening inquery: ".red,
+				err.message,
+			);
+			next(err);
+		}
+	};
+
+	deleteInquery = async (req: Request, res: Response, next: NextFunction) => {
+		try {
+			const fetchedInquery = await this.inqueryService.getInqueryById(
+				(req as any).validatedValue.inqueryId,
+			);
+
+			if (!fetchedInquery) {
+				return responseSender(res, 400, "Couldn't found inquery.");
+			}
+
+			if (fetchedInquery.images?.length > 0) {
+				// remove the images
+				for (const image of fetchedInquery.images) {
+					const filePath = path.join(
+						__dirname,
+						"../../public/inqueries",
+						image.imageName,
+					);
+					fs.unlink(filePath, (unlinkErr) => {
+						if (unlinkErr)
+							console.log(
+								"Error deleting inquery images: ".red,
+								unlinkErr.message,
+							);
+					});
+				}
+			}
+
+			const inqueryDeleted = await this.inqueryService.deleteInquery(
+				(req as any).validatedValue.inqueryId,
+			);
+
+			if (!inqueryDeleted) {
+				return responseSender(
+					res,
+					400,
+					"Failed to delete inquery. Please try again.",
+				);
+			}
+			return responseSender(res, 200, "Inquery deleted successfully.");
+		} catch (err: any) {
+			console.log(
+				"Error occured while deleting inquery: ".red,
 				err.message,
 			);
 			next(err);

@@ -1,15 +1,37 @@
 import "tsconfig-paths/register";
 import "colors";
+import "@/util/cron-job";
 import http from "http";
-import app from "@/app/app";
+import { Server } from "socket.io";
+import app, { corsOptions } from "@/app/app";
 import urlJoin from "url-join";
 import { port, apiDocsUrl, serverBaseUrl } from "@/config/dotenv.config";
-import { initializeDatabase, sequelize } from "@/config/database.config";
+import { initializeDatabase } from "@/config/database.config";
+import SocketService from "@/service/socket.service";
 
 const server = http.createServer(app);
 
+export const io = new Server(server, {
+	cors: corsOptions,
+});
+
 const initializeServer = async (): Promise<void> => {
 	try {
+		io.on("connection", (socket) => {
+			console.log("A client connected:", socket.id);
+			const socketService = new SocketService(socket.id);
+
+			socket.on("login-staff", socketService.loginStaff);
+
+			socket.on("logout-staff", socketService.logoutStaff);
+
+			socket.on("disconnect", () => {
+				console.log("A client disconnected:", socket.id);
+
+				socketService.disconnectStaff();
+			});
+		});
+
 		await initializeDatabase();
 		try {
 			server.listen(port, () => {

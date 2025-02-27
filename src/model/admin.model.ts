@@ -12,6 +12,7 @@ export interface AdminAttributes {
 	adminId: number;
 	name: string;
 	email: string;
+	phone: string;
 	password: string;
 	avatar: string;
 	tokenVersion: number;
@@ -22,6 +23,7 @@ export interface AdminAttributes {
 export interface AdminCreationAttributes {
 	name: string;
 	email: string;
+	phone: string;
 	password: string;
 }
 
@@ -46,6 +48,12 @@ class Admin extends Model<AdminAttributes, AdminCreationAttributes> {
 		allowNull: false,
 	})
 	declare email: string;
+
+	@Column({
+		type: DataType.STRING,
+		allowNull: false,
+	})
+	declare phone: string;
 
 	@Column({
 		type: DataType.STRING,

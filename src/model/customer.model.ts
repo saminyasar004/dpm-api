@@ -6,7 +6,9 @@ import {
 	PrimaryKey,
 	AutoIncrement,
 	Default,
+	HasMany,
 } from "sequelize-typescript";
+import Order from "./order.model";
 
 export interface CustomerAttributes {
 	customerId: number;
@@ -19,6 +21,7 @@ export interface CustomerAttributes {
 	verified: boolean;
 	verificationToken: string;
 	tokenVersion: number;
+	orders: Order[];
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -95,6 +98,9 @@ class Customer extends Model<CustomerAttributes, CustomerCreationAttributes> {
 	@Default(0)
 	@Column(DataType.INTEGER)
 	declare tokenVersion: number;
+
+	@HasMany(() => Order)
+	declare orders: Order[];
 }
 
 export default Customer;

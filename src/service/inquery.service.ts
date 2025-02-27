@@ -1,3 +1,4 @@
+import InqueryImage from "@/model/inquery-image.model";
 import Inquery, { InqueryAttributes } from "@/model/inquery.model";
 import { Order, WhereOptions } from "sequelize";
 
@@ -9,7 +10,6 @@ class InqueryService {
 		company: string,
 		inqueryType: string,
 		message: string,
-		designFile: string,
 		status: "open" | "closed" = "open",
 	): Promise<Inquery | InqueryAttributes | null> => {
 		try {
@@ -20,17 +20,29 @@ class InqueryService {
 				company,
 				inqueryType,
 				message,
-				designFile,
 				status,
 			});
-			const createdInquery = await Inquery.findByPk(inquery.inqueryId);
-			if (createdInquery) {
-				return createdInquery.toJSON();
-			}
-			return null;
+
+			return inquery ? inquery.toJSON() : null;
 		} catch (err: any) {
 			console.log(
 				"Error occured while creating inquery: ".red,
+				err.message,
+			);
+			throw err;
+		}
+	};
+
+	addInqueryImage = async (
+		imageName: string,
+		inqueryId: number,
+	): Promise<boolean> => {
+		try {
+			await InqueryImage.create({ imageName, inqueryId });
+			return true;
+		} catch (err: any) {
+			console.error(
+				"Error occurred while adding inquery image: ",
 				err.message,
 			);
 			throw err;
@@ -59,6 +71,47 @@ class InqueryService {
 		}
 	};
 
+	openInquery = async (
+		inqueryId: number,
+	): Promise<Inquery | InqueryAttributes | null> => {
+		try {
+			const inquery = await Inquery.findOne({
+				where: { inqueryId },
+			});
+			if (inquery) {
+				inquery.status = "open";
+				await inquery.save();
+				return inquery.toJSON();
+			}
+			return null;
+		} catch (err: any) {
+			console.log(
+				"Error occured while opening inquery: ".red,
+				err.message,
+			);
+			throw err;
+		}
+	};
+
+	deleteInquery = async (inqueryId: number): Promise<boolean> => {
+		try {
+			const inquery = await Inquery.findOne({ where: { inqueryId } });
+
+			if (!inquery) return false;
+
+			await InqueryImage.destroy({ where: { inqueryId } });
+			await inquery.destroy();
+
+			return true;
+		} catch (err: any) {
+			console.error(
+				"Error occurred while deleting inquiry: ".red,
+				err.message,
+			);
+			throw err;
+		}
+	};
+
 	getAllInqueries = async (
 		filter: WhereOptions<InqueryAttributes>,
 		limit: number,
@@ -71,6 +124,7 @@ class InqueryService {
 				limit,
 				offset,
 				order,
+				include: [{ model: InqueryImage, as: "images" }],
 			});
 			if (inqueries) {
 				return inqueries.map((inquery) => inquery.toJSON());
@@ -79,6 +133,27 @@ class InqueryService {
 		} catch (err: any) {
 			console.log(
 				"Error occured while getting inquery: ".red,
+				err.message,
+			);
+			throw err;
+		}
+	};
+
+	getInqueryById = async (
+		inqueryId: number,
+	): Promise<Inquery | InqueryAttributes | null> => {
+		try {
+			const inquery = await Inquery.findOne({
+				where: { inqueryId },
+				include: [{ model: InqueryImage, as: "images" }],
+			});
+			if (inquery) {
+				return inquery.toJSON();
+			}
+			return null;
+		} catch (err: any) {
+			console.log(
+				"Error occured while finding inquery by id: ".red,
 				err.message,
 			);
 			throw err;

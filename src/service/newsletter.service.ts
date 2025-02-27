@@ -116,6 +116,25 @@ class NewsletterService {
 			throw err;
 		}
 	};
+
+	deleteByEmail = async (email: string): Promise<boolean> => {
+		try {
+			const newsletter = await Newsletter.findOne({
+				where: { email },
+			});
+			if (newsletter) {
+				await newsletter.destroy();
+				return true;
+			}
+			return false;
+		} catch (err: any) {
+			console.log(
+				"Error occured while deleting a record from newsletter: ".red,
+				err.message,
+			);
+			throw err;
+		}
+	};
 }
 
 export default NewsletterService;
