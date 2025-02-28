@@ -1,9 +1,9 @@
 import express from "express";
-import StaffController from "@/controller/staff.controller";
-import StaffMiddleware from "@/middleware/staff.middleware";
-import AuthMiddleware from "@/middleware/auth.middleware";
-import ImageUploaderMiddleware from "@/middleware/imageUploader.middleware";
-import { strictLimiter } from "@/middleware/rateLimiter.middleware";
+import StaffController from "../controller/staff.controller";
+import StaffMiddleware from "../middleware/staff.middleware";
+import AuthMiddleware from "../middleware/auth.middleware";
+import ImageUploaderMiddleware from "../middleware/imageUploader.middleware";
+import { strictLimiter } from "../middleware/rateLimiter.middleware";
 
 const staffController = new StaffController();
 const staffMiddleware = new StaffMiddleware();

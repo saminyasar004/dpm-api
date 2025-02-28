@@ -17,11 +17,10 @@ export interface OrderStatusAttributes {
 }
 
 export interface OrderStatusCreationAttributes {
-	orderStatusId: number;
 	name: string;
 }
 
-@Table({ tableName: "OrderStatuses", timestamps: false })
+@Table({ tableName: "OrderStatuses", timestamps: true })
 export default class OrderStatus extends Model<
 	OrderStatusAttributes,
 	OrderStatusCreationAttributes

@@ -1,8 +1,11 @@
 import express from "express";
-import CustomerMiddleware from "@/middleware/customer.middleware";
-import CustomerController from "@/controller/customer.controller";
-import AuthMiddleware from "@/middleware/auth.middleware";
-import { apiLimiter, strictLimiter } from "@/middleware/rateLimiter.middleware";
+import CustomerMiddleware from "../middleware/customer.middleware";
+import CustomerController from "../controller/customer.controller";
+import AuthMiddleware from "../middleware/auth.middleware";
+import {
+	apiLimiter,
+	strictLimiter,
+} from "../middleware/rateLimiter.middleware";
 
 const customerMiddleware = new CustomerMiddleware();
 const customerController = new CustomerController();

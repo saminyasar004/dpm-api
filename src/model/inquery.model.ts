@@ -8,7 +8,7 @@ import {
 	Default,
 	HasMany,
 } from "sequelize-typescript";
-import InqueryImage from "@/model/inquery-image.model";
+import InqueryImage from "./inquery-image.model";
 
 export interface InqueryAttributes {
 	inqueryId: number;

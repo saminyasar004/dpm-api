@@ -1,13 +1,13 @@
 import "tsconfig-paths/register";
 import "colors";
-import "@/util/cron-job";
+import "./util/cron-job";
 import http from "http";
 import { Server } from "socket.io";
-import app, { corsOptions } from "@/app/app";
+import app, { corsOptions } from "./app/app";
 import urlJoin from "url-join";
-import { port, apiDocsUrl, serverBaseUrl } from "@/config/dotenv.config";
-import { initializeDatabase } from "@/config/database.config";
-import SocketService from "@/service/socket.service";
+import { port, apiDocsUrl, serverBaseUrl } from "./config/dotenv.config";
+import { initializeDatabase } from "./config/database.config";
+import SocketService from "./service/socket.service";
 
 const server = http.createServer(app);
 

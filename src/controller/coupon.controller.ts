@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import { createSlug, responseSender } from "@/util";
+import { responseSender } from "../util";
 import { Op, Order, WhereOptions } from "sequelize";
-import CouponService from "@/service/coupon.service";
-import { CouponAttributes } from "@/model/coupon.model";
+import CouponService from "../service/coupon.service";
+import { CouponAttributes } from "../model/coupon.model";
 
 class CouponController {
 	private couponService: CouponService;

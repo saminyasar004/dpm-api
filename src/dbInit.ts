@@ -1,7 +1,7 @@
 import "tsconfig-paths/register";
 import "colors";
 import { Sequelize } from "sequelize-typescript";
-import { dbName, dbUser, dbPassword } from "@/config/dotenv.config";
+import { dbName, dbUser, dbPassword } from "./config/dotenv.config";
 
 const sequelize = new Sequelize("", dbUser, dbPassword, {
 	host: "localhost",

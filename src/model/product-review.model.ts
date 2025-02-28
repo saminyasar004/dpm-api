@@ -11,8 +11,8 @@ import {
 	BelongsTo,
 	Default,
 } from "sequelize-typescript";
-import Product from "@/model/product.model";
-import Customer from "@/model/customer.model";
+import Product from "./product.model";
+import Customer from "./customer.model";
 
 export interface ProductReviewAttributes {
 	reviewId: number;

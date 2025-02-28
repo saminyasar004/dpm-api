@@ -7,13 +7,17 @@ import {
 	ForeignKey,
 	BelongsTo,
 	DataType,
+	HasMany,
 } from "sequelize-typescript";
 import Order from "./order.model";
+import Product from "./product.model";
+import OrderItemVariation from "./order-item-variation.model";
 
 export interface OrderItemAttributes {
 	orderItemId: number;
 	orderId: number;
-	productName: string;
+	productId: number;
+	variationItems: OrderItemVariation[];
 	quantity: number;
 	price: number;
 	createdAt: Date;
@@ -21,9 +25,9 @@ export interface OrderItemAttributes {
 }
 
 export interface OrderItemCreationAttributes {
-	orderItemId: number;
 	orderId: number;
-	productName: string;
+	productId: number;
+	variationItems: OrderItemVariation[];
 	quantity: number;
 	price: number;
 }
@@ -42,8 +46,12 @@ export default class OrderItem extends Model<
 	@Column(DataType.INTEGER)
 	declare orderId: number;
 
-	@Column(DataType.STRING)
-	declare productName: string;
+	@ForeignKey(() => Product)
+	@Column(DataType.INTEGER)
+	declare productId: number;
+
+	@HasMany(() => OrderItemVariation)
+	declare variationItems: OrderItemVariation[];
 
 	@Column(DataType.INTEGER)
 	declare quantity: number;

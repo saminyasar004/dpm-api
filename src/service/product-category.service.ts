@@ -1,9 +1,9 @@
 import ProductCategory, {
 	ProductCategoryAttributes,
 	ProductCategoryCreationAttributes,
-} from "@/model/product-category.model";
-import Product from "@/model/product.model";
-import { createSlug } from "@/util";
+} from "../model/product-category.model";
+import Product from "../model/product.model";
+import { createSlug } from "../util";
 import { Order, WhereOptions } from "sequelize";
 
 class ProductCategoryService {

@@ -1,7 +1,7 @@
-import AdminService from "@/service/admin.service";
-import StaffService from "@/service/staff.service";
-import CustomerService from "@/service/customer.service";
-import { responseSender, verifyToken } from "@/util";
+import AdminService from "../service/admin.service";
+import StaffService from "../service/staff.service";
+import CustomerService from "../service/customer.service";
+import { responseSender, verifyToken } from "../util";
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import Joi from "joi";

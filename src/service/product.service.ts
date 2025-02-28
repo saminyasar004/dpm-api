@@ -1,17 +1,17 @@
 import Product, {
 	ProductModelAttributes,
 	ProductModelCreationAttributes,
-} from "@/model/product.model";
+} from "../model/product.model";
 import ProductAttributes, {
 	ProductAttributeCreationProps,
-} from "@/model/product-attribute.model";
+} from "../model/product-attribute.model";
 import ProductBulkDiscount, {
 	ProductBulkDiscountCreationAttributes,
-} from "@/model/product-bulk-discount.model";
-import ProductImage from "@/model/product-image.model";
-import ProductVariationItem from "@/model/product-variation-item.model";
+} from "../model/product-bulk-discount.model";
+import ProductImage from "../model/product-image.model";
+import ProductVariationItem from "../model/product-variation-item.model";
 import { WhereOptions, Order } from "sequelize";
-import { createSlug } from "@/util";
+import { createSlug } from "../util";
 import crypto from "crypto";
 
 class ProductService {

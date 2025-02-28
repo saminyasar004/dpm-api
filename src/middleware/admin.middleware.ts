@@ -1,6 +1,6 @@
 import Joi from "joi";
 import { Request, Response, NextFunction } from "express";
-import { responseSender } from "@/util";
+import { responseSender } from "../util";
 
 class AdminMiddleware {
 	private schema: {

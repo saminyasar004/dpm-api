@@ -14,12 +14,20 @@ import Staff from "./staff.model";
 import OrderStatus from "./order-status.model";
 import OrderItem from "./order-item.model";
 import PaymentDetails from "./payment-details.model";
+import Coupon from "./coupon.model";
 
 export interface OrderAttributes {
 	orderId: number;
 	customerId: number;
 	staffId: number;
 	statusId: number;
+	deliveryMethod: "shop-pickup" | "courier";
+	billingAddress: string;
+	billingAddressCity: string;
+	billingAddressPostCode: string;
+	additionalNotes: string;
+	deliveryDate: Date;
+	couponId?: number;
 	orderItems: OrderItem[];
 	payments: PaymentDetails[];
 	createdAt: Date;
@@ -27,12 +35,15 @@ export interface OrderAttributes {
 }
 
 export interface OrderCreationAttributes {
-	orderId: number;
 	customerId: number;
 	staffId: number;
 	statusId: number;
-	orderItems: OrderItem[];
-	payments: PaymentDetails[];
+	couponId?: number;
+	deliveryMethod: "shop-pickup" | "courier";
+	billingAddress: string;
+	billingAddressCity: string;
+	billingAddressPostCode: string;
+	deliveryDate: Date;
 }
 
 @Table({ tableName: "Orders", timestamps: true })
@@ -53,9 +64,32 @@ export default class Order extends Model<
 	@Column(DataType.INTEGER)
 	declare staffId: number;
 
+	@ForeignKey(() => Coupon)
+	@Column({ type: DataType.INTEGER, allowNull: true })
+	declare couponId?: number;
+
 	@ForeignKey(() => OrderStatus)
 	@Column(DataType.INTEGER)
 	declare statusId: number;
+
+	@Column({ type: DataType.STRING, allowNull: false })
+	declare billingAddress: string;
+
+	@Column({ type: DataType.STRING, allowNull: false })
+	declare billingAddressCity: string;
+
+	@Column({ type: DataType.STRING, allowNull: false })
+	declare billingAddressPostCode: string;
+
+	@Column({
+		type: DataType.ENUM("shop-pickup", "courier"),
+		defaultValue: "shop-pickup",
+		allowNull: false,
+	})
+	declare deliveryMethod: "shop-pickup" | "courier";
+
+	@Column({ type: DataType.DATE, allowNull: true })
+	declare deliveryDate: Date | null;
 
 	@BelongsTo(() => Customer)
 	declare customer: Customer;
@@ -63,12 +97,15 @@ export default class Order extends Model<
 	@BelongsTo(() => Staff)
 	declare staff: Staff;
 
+	@BelongsTo(() => Coupon)
+	declare coupon: Coupon;
+
 	@BelongsTo(() => OrderStatus)
 	declare status: OrderStatus;
 
-	@HasMany(() => OrderItem)
+	@HasMany(() => OrderItem, { as: "orderItems" })
 	declare orderItems: OrderItem[];
 
-	@HasMany(() => PaymentDetails)
+	@HasMany(() => PaymentDetails, { as: "payments" })
 	declare payments: PaymentDetails[];
 }

@@ -20,7 +20,6 @@ export interface PaymentDetailsAttributes {
 }
 
 export interface PaymentDetailsCreationAttributes {
-	paymentId: number;
 	orderId: number;
 	paymentMethod: string;
 	amount: number;

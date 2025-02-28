@@ -1,6 +1,6 @@
-import { responseSender, hashedPassword, comparePassword } from "@/util";
+import { responseSender, hashedPassword, comparePassword } from "../util";
 import { Request, Response, NextFunction } from "express";
-import AdminService from "@/service/admin.service";
+import AdminService from "../service/admin.service";
 import fs from "fs";
 import path from "path";
 

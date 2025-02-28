@@ -4,29 +4,30 @@ import morgan from "morgan";
 import helmet from "helmet";
 import compression from "compression";
 import swaggerUi from "swagger-ui-express";
-import swaggerSpecs from "@/config/swagger.config";
+import swaggerSpecs from "../config/swagger.config";
 
 import {
 	serverUrlPrefix,
 	apiDocsUrl,
 	apiWhitelistedDomains,
-} from "@/config/dotenv.config";
-import { responseSender } from "@/util";
+} from "../config/dotenv.config";
+import { responseSender } from "../util";
 
-import adminRouter from "@/routes/admin.route";
-import notFoundController from "@/controller/notFound.controller";
-import errorController from "@/controller/error.controller";
-import staffRouter from "@/routes/staff.route";
-import newsletterRouter from "@/routes/newsletter.route";
-import inqueryRouter from "@/routes/inquery.route";
-import customerRouter from "@/routes/customer.route";
-import faqRouter from "@/routes/faq.route";
-import authRouter from "@/routes/auth.route";
-import productCategoryRouter from "@/routes/product-category.route";
-import productVariationRouter from "@/routes/product-variation.route";
-import productRouter from "@/routes/product.route";
-import productReviewRouter from "@/routes/product-review.route";
-import couponRouter from "@/routes/coupon.route";
+import adminRouter from "../routes/admin.route";
+import notFoundController from "../controller/notFound.controller";
+import errorController from "../controller/error.controller";
+import staffRouter from "../routes/staff.route";
+import newsletterRouter from "../routes/newsletter.route";
+import inqueryRouter from "../routes/inquery.route";
+import customerRouter from "../routes/customer.route";
+import faqRouter from "../routes/faq.route";
+import authRouter from "../routes/auth.route";
+import productCategoryRouter from "../routes/product-category.route";
+import productVariationRouter from "../routes/product-variation.route";
+import productRouter from "../routes/product.route";
+import productReviewRouter from "../routes/product-review.route";
+import couponRouter from "../routes/coupon.route";
+import orderRouter from "../routes/order.route";
 
 const app = express();
 
@@ -128,6 +129,9 @@ app.use(`${serverUrlPrefix}/coupon`, couponRouter);
 
 // product routes
 app.use(`${serverUrlPrefix}/product`, productRouter);
+
+// order routes
+app.use(`${serverUrlPrefix}/order`, orderRouter);
 
 // 404 middleware
 app.use(notFoundController);

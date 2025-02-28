@@ -6,7 +6,9 @@ import {
 	PrimaryKey,
 	AutoIncrement,
 	Default,
+	HasMany,
 } from "sequelize-typescript";
+import Order from "./order.model";
 
 export interface CouponAttributes {
 	couponId: number;
@@ -18,6 +20,7 @@ export interface CouponAttributes {
 	endDate: Date;
 	isActive: boolean;
 	categoryId: number | null;
+	orders: Order[];
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -64,6 +67,9 @@ class Coupon extends Model<CouponAttributes, CopuonCreationAttributes> {
 	@Default(null)
 	@Column({ type: DataType.INTEGER, allowNull: true })
 	declare categoryId: number;
+
+	@HasMany(() => Order)
+	declare orders: Order[];
 }
 
 export default Coupon;

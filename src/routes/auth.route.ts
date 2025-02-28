@@ -1,7 +1,7 @@
 import express from "express";
-import AuthMiddleware from "@/middleware/auth.middleware";
-import { strictLimiter } from "@/middleware/rateLimiter.middleware";
-import AuthController from "@/controller/auth.controller";
+import AuthMiddleware from "../middleware/auth.middleware";
+import { strictLimiter } from "../middleware/rateLimiter.middleware";
+import AuthController from "../controller/auth.controller";
 
 const authMiddleware = new AuthMiddleware();
 const authController = new AuthController();

@@ -1,11 +1,11 @@
-import InqueryService from "@/service/inquery.service";
-import { responseSender } from "@/util";
-import { InqueryAttributes } from "@/model/inquery.model";
+import InqueryService from "../service/inquery.service";
+import { responseSender } from "../util";
+import { InqueryAttributes } from "../model/inquery.model";
 import { Op, Order, WhereOptions } from "sequelize";
 import { Request, Response, NextFunction } from "express";
 import path from "path";
 import fs from "fs";
-import { io } from "@/server";
+import { io } from "../server";
 
 class InqueryController {
 	private inqueryService: InqueryService;

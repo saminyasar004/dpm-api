@@ -1,11 +1,11 @@
 import nodemailer from "nodemailer";
-import { loadTemplate } from "@/util";
+import { loadTemplate } from "../util";
 import {
 	mailServerHost,
 	mailServerPort,
 	mailServerUser,
 	mailServerPassword,
-} from "@/config/dotenv.config";
+} from "../config/dotenv.config";
 
 class EmailService {
 	sendEmail = async (

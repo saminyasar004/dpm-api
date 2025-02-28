@@ -5,7 +5,7 @@ import {
 	rateLimitMax,
 	strictRateLimitWindow,
 	strictRateLimitMax,
-} from "@/config/dotenv.config";
+} from "../config/dotenv.config";
 
 export const apiLimiter = rateLimit({
 	windowMs: parseInt(rateLimitWindow) * 60 * 1000, // 15 minutes

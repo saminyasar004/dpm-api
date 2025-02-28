@@ -1,5 +1,5 @@
-import InqueryImage from "@/model/inquery-image.model";
-import Inquery, { InqueryAttributes } from "@/model/inquery.model";
+import InqueryImage from "../model/inquery-image.model";
+import Inquery, { InqueryAttributes } from "../model/inquery.model";
 import { Order, WhereOptions } from "sequelize";
 
 class InqueryService {

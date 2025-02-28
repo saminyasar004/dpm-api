@@ -1,4 +1,4 @@
-import Customer, { CustomerAttributes } from "@/model/customer.model";
+import Customer, { CustomerAttributes } from "../model/customer.model";
 import { Order, WhereOptions } from "sequelize";
 
 class CustomerService {

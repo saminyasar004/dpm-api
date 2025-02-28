@@ -1,8 +1,4 @@
-import {
-	frontendLandingPageUrl,
-	serverBaseUrl,
-	serverUrlPrefix,
-} from "@/config/dotenv.config";
+import { serverBaseUrl, serverUrlPrefix } from "../config/dotenv.config";
 import {
 	responseSender,
 	hashedPassword,
@@ -10,15 +6,15 @@ import {
 	generateVerificationToken,
 	comparePassword,
 	generateOTP,
-} from "@/util";
+} from "../util";
 import urlJoin from "url-join";
-import CustomerService from "@/service/customer.service";
-import EmailService from "@/service/email.service";
-import OtpService from "@/service/otp.service";
+import CustomerService from "../service/customer.service";
+import EmailService from "../service/email.service";
+import OtpService from "../service/otp.service";
 import { Request, Response, NextFunction } from "express";
 import { Op, Order, WhereOptions } from "sequelize";
-import { CustomerAttributes } from "@/model/customer.model";
-import { io } from "@/server";
+import { CustomerAttributes } from "../model/customer.model";
+import { io } from "../server";
 
 class CustomerController {
 	private customerService: CustomerService;

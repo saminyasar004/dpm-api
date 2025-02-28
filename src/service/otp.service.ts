@@ -1,4 +1,4 @@
-import Otp, { OtpAttributes } from "@/model/otp.model";
+import Otp, { OtpAttributes } from "../model/otp.model";
 import { Op } from "sequelize";
 
 class OtpService {

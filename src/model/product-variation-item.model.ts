@@ -5,8 +5,8 @@ import {
 	DataType,
 	ForeignKey,
 } from "sequelize-typescript";
-import Product from "@/model/product.model";
-import VariationItem from "@/model/variation-item.model";
+import Product from "./product.model";
+import VariationItem from "./variation-item.model";
 
 export interface ProductVariationItemAttributes {
 	productId: number;

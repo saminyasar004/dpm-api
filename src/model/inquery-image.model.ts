@@ -8,7 +8,7 @@ import {
 	ForeignKey,
 	BelongsTo,
 } from "sequelize-typescript";
-import Inquery from "@/model/inquery.model";
+import Inquery from "./inquery.model";
 
 export interface InqueryImageAttributes {
 	imageId: number;

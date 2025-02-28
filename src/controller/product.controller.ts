@@ -1,8 +1,8 @@
-import ProductService from "@/service/product.service";
+import ProductService from "../service/product.service";
 import { Request, Response, NextFunction } from "express";
-import { responseSender } from "@/util";
+import { responseSender } from "../util";
 import { Op, Order, WhereOptions } from "sequelize";
-import { ProductModelAttributes } from "@/model/product.model";
+import { ProductModelAttributes } from "../model/product.model";
 import fs from "fs";
 import path from "path";
 

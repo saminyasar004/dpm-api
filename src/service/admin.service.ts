@@ -1,4 +1,4 @@
-import Admin, { AdminAttributes } from "@/model/admin.model";
+import Admin, { AdminAttributes } from "../model/admin.model";
 
 class AdminService {
 	registerAdmin = async (

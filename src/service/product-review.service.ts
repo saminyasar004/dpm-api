@@ -1,10 +1,9 @@
-import Customer from "@/model/customer.model";
-import ProductImage from "@/model/product-image.model";
+import Customer from "../model/customer.model";
 import ProductReview, {
 	ProductReviewAttributes,
-} from "@/model/product-review.model";
-import Product from "@/model/product.model";
-import { Op, Order, WhereOptions } from "sequelize";
+} from "../model/product-review.model";
+import Product from "../model/product.model";
+import { Order, WhereOptions } from "sequelize";
 
 class ProductReviewService {
 	// create a new product review

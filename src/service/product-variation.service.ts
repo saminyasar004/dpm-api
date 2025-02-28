@@ -1,10 +1,7 @@
-import Variation, {
-	VariationAttributes,
-	VariationCreationAttributes,
-} from "@/model/variation.model";
+import Variation, { VariationAttributes } from "../model/variation.model";
 import VariationItem, {
 	VariationItemAttributes,
-} from "@/model/variation-item.model";
+} from "../model/variation-item.model";
 import { Order, WhereOptions } from "sequelize";
 
 class ProductVariationService {

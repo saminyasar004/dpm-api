@@ -10,9 +10,7 @@ import {
 	ForeignKey,
 	BelongsToMany,
 } from "sequelize-typescript";
-import VariationItem from "@/model/variation-item.model";
-import Product from "@/model/product.model";
-import ProductVariationItem from "./product-variation-item.model";
+import VariationItem from "./variation-item.model";
 
 export interface VariationAttributes {
 	variationId: number;

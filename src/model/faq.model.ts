@@ -7,7 +7,7 @@ import {
 	DataType,
 	HasMany,
 } from "sequelize-typescript";
-import FaqItem from "@/model/faq-item.model";
+import FaqItem from "./faq-item.model";
 
 export interface FaqAttributes {
 	faqId: number;

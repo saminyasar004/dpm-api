@@ -10,12 +10,12 @@ import {
 	HasMany,
 	BelongsToMany,
 } from "sequelize-typescript";
-import ProductCategory from "@/model/product-category.model";
-import ProductAttribute from "@/model/product-attribute.model";
-import ProductBulkDiscount from "@/model/product-bulk-discount.model";
-import ProductImage from "@/model/product-image.model";
-import ProductReview from "@/model/product-review.model";
-import ProductTag from "@/model/product-tags.model";
+import ProductCategory from "./product-category.model";
+import ProductAttribute from "./product-attribute.model";
+import ProductBulkDiscount from "./product-bulk-discount.model";
+import ProductImage from "./product-image.model";
+import ProductReview from "./product-review.model";
+import ProductTag from "./product-tags.model";
 import ProductVariationItem from "./product-variation-item.model";
 
 export interface ProductModelAttributes {

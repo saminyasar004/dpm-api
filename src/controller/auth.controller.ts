@@ -3,10 +3,10 @@ import {
 	hashedPassword,
 	comparePassword,
 	generateJWTToken,
-} from "@/util";
+} from "../util";
 import { Request, Response, NextFunction } from "express";
-import AdminService from "@/service/admin.service";
-import StaffService from "@/service/staff.service";
+import AdminService from "../service/admin.service";
+import StaffService from "../service/staff.service";
 
 class AuthController {
 	private adminService: AdminService;

@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import ProductCategoryService from "@/service/product-category.service";
-import { createSlug, responseSender } from "@/util";
+import ProductCategoryService from "../service/product-category.service";
+import { createSlug, responseSender } from "../util";
 import { Op, Order, WhereOptions } from "sequelize";
-import { ProductCategoryAttributes } from "@/model/product-category.model";
+import { ProductCategoryAttributes } from "../model/product-category.model";
 
 class ProductCategoryController {
 	private productCategoryService: ProductCategoryService;

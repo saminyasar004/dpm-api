@@ -1,5 +1,5 @@
-import Staff, { StaffAttributes } from "@/model/staff.model";
-import { io } from "@/server";
+import Staff, { StaffAttributes } from "../model/staff.model";
+import { io } from "../server";
 import { Order, WhereOptions } from "sequelize";
 
 class StaffService {

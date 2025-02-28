@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import { v4 as uuid } from "uuid";
 import path from "path";
 import ejs from "ejs";
-import { jwtSecret, jwtExpiresIn } from "@/config/dotenv.config";
+import { jwtSecret, jwtExpiresIn } from "../config/dotenv.config";
 import { Response } from "express";
 import slugify from "slugify";
 
@@ -51,7 +51,7 @@ export const comparePassword = async (
 
 export const generateJWTToken = (payload: {}): string => {
 	try {
-		return jwt.sign(payload, jwtSecret, { expiresIn: jwtExpiresIn });
+		return jwt.sign(payload, jwtSecret, { expiresIn: jwtExpiresIn as any });
 	} catch (err: any) {
 		console.log("Error occured while generating token: ".red, err.message);
 		throw err;

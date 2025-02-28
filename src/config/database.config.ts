@@ -1,5 +1,5 @@
 import { Sequelize } from "sequelize-typescript";
-import { nodeEnv, dbConnectionString } from "@/config/dotenv.config";
+import { nodeEnv, dbConnectionString } from "../config/dotenv.config";
 import path from "path";
 
 export const sequelize = new Sequelize(dbConnectionString, {
@@ -13,7 +13,8 @@ export const sequelize = new Sequelize(dbConnectionString, {
 	},
 	dialectOptions: {
 		ssl: {
-			rejectUnauthorized: nodeEnv === "production",
+			require: false, // Disable SSL
+			rejectUnauthorized: false, // Disable SSL certificate validation
 		},
 	},
 	models: [path.resolve(__dirname, "../model")],

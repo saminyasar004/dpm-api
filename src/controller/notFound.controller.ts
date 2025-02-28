@@ -1,4 +1,4 @@
-import { responseSender } from "@/util";
+import { responseSender } from "../util";
 import { Request, Response, NextFunction } from "express";
 
 const notFoundController = (

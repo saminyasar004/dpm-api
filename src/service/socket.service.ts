@@ -1,4 +1,4 @@
-import StaffService from "@/service/staff.service";
+import StaffService from "../service/staff.service";
 
 class SocketService {
 	private staffService: StaffService;

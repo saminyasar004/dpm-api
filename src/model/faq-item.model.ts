@@ -9,7 +9,7 @@ import {
 	BelongsTo,
 } from "sequelize-typescript";
 
-import Faq from "@/model/faq.model";
+import Faq from "./faq.model";
 
 export interface FaqItemAttributes {
 	faqItemId: number;

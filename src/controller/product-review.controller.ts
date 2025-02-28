@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import ProductReviewService from "@/service/product-review.service";
-import { responseSender } from "@/util";
+import ProductReviewService from "../service/product-review.service";
+import { responseSender } from "../util";
 import { Op, Order, WhereOptions } from "sequelize";
-import { ProductReviewAttributes } from "@/model/product-review.model";
+import { ProductReviewAttributes } from "../model/product-review.model";
 
 class ProductReviewController {
 	private productReviewService: ProductReviewService;

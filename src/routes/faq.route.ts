@@ -1,8 +1,8 @@
 import express from "express";
-import FaqController from "@/controller/faq.controller";
-import FaqMiddleware from "@/middleware/faq.middleware";
-import AuthMiddleware from "@/middleware/auth.middleware";
-import { strictLimiter } from "@/middleware/rateLimiter.middleware";
+import FaqController from "../controller/faq.controller";
+import FaqMiddleware from "../middleware/faq.middleware";
+import AuthMiddleware from "../middleware/auth.middleware";
+import { strictLimiter } from "../middleware/rateLimiter.middleware";
 
 const faqController = new FaqController();
 const faqMiddleware = new FaqMiddleware();

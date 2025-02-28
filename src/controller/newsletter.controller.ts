@@ -1,12 +1,12 @@
-import NewsletterService from "@/service/newsletter.service";
-import EmailService from "@/service/email.service";
-import { responseSender, generateVerificationToken } from "@/util";
+import NewsletterService from "../service/newsletter.service";
+import EmailService from "../service/email.service";
+import { responseSender, generateVerificationToken } from "../util";
 import urlJoin from "url-join";
 import { Op, Order, WhereOptions } from "sequelize";
-import { serverBaseUrl, serverUrlPrefix } from "@/config/dotenv.config";
+import { serverBaseUrl, serverUrlPrefix } from "../config/dotenv.config";
 import { Request, Response, NextFunction } from "express";
-import { NewsletterAttributes } from "@/model/newsletter.model";
-import { io } from "@/server";
+import { NewsletterAttributes } from "../model/newsletter.model";
+import { io } from "../server";
 
 class NewsletterController {
 	private newsletterService: NewsletterService;

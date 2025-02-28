@@ -1,9 +1,12 @@
 import express from "express";
-import AuthMiddleware from "@/middleware/auth.middleware";
-import InqueryMiddleware from "@/middleware/inquery.middleware";
-import InqueryController from "@/controller/inquery.controller";
-import { apiLimiter, strictLimiter } from "@/middleware/rateLimiter.middleware";
-import ImageUploaderMiddleware from "@/middleware/imageUploader.middleware";
+import AuthMiddleware from "../middleware/auth.middleware";
+import InqueryMiddleware from "../middleware/inquery.middleware";
+import InqueryController from "../controller/inquery.controller";
+import {
+	apiLimiter,
+	strictLimiter,
+} from "../middleware/rateLimiter.middleware";
+import ImageUploaderMiddleware from "../middleware/imageUploader.middleware";
 
 const authMiddleware = new AuthMiddleware();
 const inqueryMiddleware = new InqueryMiddleware();

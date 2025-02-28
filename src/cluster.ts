@@ -1,7 +1,7 @@
 import "colors";
 import cluster from "cluster";
 import os from "os";
-import initializeServer from "@/server";
+import initializeServer from "./server";
 
 if (cluster.isMaster) {
 	const numCPUs = os.cpus().length;

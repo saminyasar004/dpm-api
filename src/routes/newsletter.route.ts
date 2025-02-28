@@ -1,8 +1,11 @@
 import express from "express";
-import NewsletterMiddleware from "@/middleware/newsletter.middleware";
-import NewsletterController from "@/controller/newsletter.controller";
-import AuthMiddleware from "@/middleware/auth.middleware";
-import { apiLimiter, strictLimiter } from "@/middleware/rateLimiter.middleware";
+import NewsletterMiddleware from "../middleware/newsletter.middleware";
+import NewsletterController from "../controller/newsletter.controller";
+import AuthMiddleware from "../middleware/auth.middleware";
+import {
+	apiLimiter,
+	strictLimiter,
+} from "../middleware/rateLimiter.middleware";
 
 const newsletterMiddleware = new NewsletterMiddleware();
 const newsletterController = new NewsletterController();

@@ -1,9 +1,9 @@
 import express from "express";
-import AuthMiddleware from "@/middleware/auth.middleware";
-import { strictLimiter } from "@/middleware/rateLimiter.middleware";
-import ProductMiddleware from "@/middleware/product.middleware";
-import ProductController from "@/controller/product.controller";
-import ImageUploaderMiddleware from "@/middleware/imageUploader.middleware";
+import AuthMiddleware from "../middleware/auth.middleware";
+import { strictLimiter } from "../middleware/rateLimiter.middleware";
+import ProductMiddleware from "../middleware/product.middleware";
+import ProductController from "../controller/product.controller";
+import ImageUploaderMiddleware from "../middleware/imageUploader.middleware";
 
 const productMiddleware = new ProductMiddleware();
 const productController = new ProductController();

@@ -8,7 +8,7 @@ import {
 	ForeignKey,
 	BelongsTo,
 } from "sequelize-typescript";
-import Product from "@/model/product.model";
+import Product from "./product.model";
 
 export interface ProductTagAttributes {
 	tagId: number;

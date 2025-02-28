@@ -1,8 +1,8 @@
 import express from "express";
-import AuthMiddleware from "@/middleware/auth.middleware";
-import { strictLimiter } from "@/middleware/rateLimiter.middleware";
-import ProductReviewMiddleware from "@/middleware/product-review.middleware";
-import ProductReviewController from "@/controller/product-review.controller";
+import AuthMiddleware from "../middleware/auth.middleware";
+import { strictLimiter } from "../middleware/rateLimiter.middleware";
+import ProductReviewMiddleware from "../middleware/product-review.middleware";
+import ProductReviewController from "../controller/product-review.controller";
 
 const productReviewMiddleware = new ProductReviewMiddleware();
 const productReviewController = new ProductReviewController();

@@ -1,6 +1,6 @@
-import { FaqAttributes } from "@/model/faq.model";
-import FaqService from "@/service/faq.service";
-import { responseSender } from "@/util";
+import { FaqAttributes } from "../model/faq.model";
+import FaqService from "../service/faq.service";
+import { responseSender } from "../util";
 import { Request, Response, NextFunction } from "express";
 import { Op, WhereOptions } from "sequelize";
 

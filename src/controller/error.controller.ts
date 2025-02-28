@@ -1,4 +1,4 @@
-import { responseSender } from "@/util";
+import { responseSender } from "../util";
 import multer from "multer";
 import { Request, Response, NextFunction } from "express";
 

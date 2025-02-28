@@ -1,4 +1,4 @@
-import StaffService from "@/service/staff.service";
+import StaffService from "../service/staff.service";
 import fs from "fs";
 import path from "path";
 import {
@@ -6,11 +6,11 @@ import {
 	hashedPassword,
 	comparePassword,
 	generateJWTToken,
-} from "@/util";
+} from "../util";
 import { Request, Response, NextFunction } from "express-serve-static-core";
-import AdminService from "@/service/admin.service";
+import AdminService from "../service/admin.service";
 import { Op, Order, WhereOptions } from "sequelize";
-import { StaffAttributes } from "@/model/staff.model";
+import { StaffAttributes } from "../model/staff.model";
 
 class StaffController {
 	private staffService: StaffService;

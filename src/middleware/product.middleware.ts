@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { responseSender } from "@/util";
+import { responseSender } from "../util";
 import { Request, Response, NextFunction } from "express";
 
 class ProductMiddleware {

@@ -1,8 +1,8 @@
 import express from "express";
-import AuthMiddleware from "@/middleware/auth.middleware";
-import { strictLimiter } from "@/middleware/rateLimiter.middleware";
-import CouponMiddleware from "@/middleware/coupon.middleware";
-import CouponController from "@/controller/coupon.controller";
+import AuthMiddleware from "../middleware/auth.middleware";
+import { strictLimiter } from "../middleware/rateLimiter.middleware";
+import CouponMiddleware from "../middleware/coupon.middleware";
+import CouponController from "../controller/coupon.controller";
 
 const couponMiddleware = new CouponMiddleware();
 const couponController = new CouponController();

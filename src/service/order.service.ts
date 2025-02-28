@@ -1,5 +1,15 @@
-import Order, { OrderAttributes } from "@/model/order.model";
+import Order, { OrderAttributes } from "../model/order.model";
 import StaffService from "./staff.service";
+import OrderStatus, {
+	OrderStatusAttributes,
+} from "../model/order-status.model";
+import OrderItem, {
+	OrderItemCreationAttributes,
+} from "../model/order-item.model";
+import PaymentDetails, {
+	PaymentDetailsCreationAttributes,
+} from "../model/payment-details.model";
+import { WhereOptions, Order as SequelizeOrder } from "sequelize";
 
 class OrderService {
 	private staffService: StaffService;
@@ -7,91 +17,123 @@ class OrderService {
 		this.staffService = new StaffService();
 	}
 
-	// createOrder = async (
-	// 	customerId: number,
+	createOrderStatus = async (
+		statusName: string,
+	): Promise<OrderStatus | OrderStatusAttributes | null> => {
+		try {
+			const newStatus = await OrderStatus.create({ name: statusName });
+
+			return newStatus ? newStatus.toJSON() : null;
+		} catch (err: any) {
+			console.error(
+				"Error occurred while creating order status: ",
+				err.message,
+			);
+			throw err;
+		}
+	};
+
+	editOrderStatus = async (
+		statusName: string,
+		orderStatusId: number,
+	): Promise<boolean> => {
+		try {
+			const status = await OrderStatus.findByPk(orderStatusId);
+
+			if (status) {
+				const isUpdated = await OrderStatus.update(
+					{
+						name: statusName,
+					},
+					{ where: { orderStatusId } },
+				);
+
+				if (isUpdated) return true;
+			}
+			return false;
+		} catch (err: any) {
+			console.error(
+				"Error occurred while creating order status: ",
+				err.message,
+			);
+			throw err;
+		}
+	};
+
+	createOrder = async (
+		customerId: number,
+		staffId: number,
+		statusId: number,
+		billingAddress: string,
+		billingAddressCity: string,
+		billingAddressPostCode: string,
+		deliveryMethod: "shop-pickup" | "courier",
+		orderItems: OrderItemCreationAttributes[],
+		payments: PaymentDetailsCreationAttributes[],
+		deliveryDate: Date,
+		couponId?: number,
+	): Promise<Order | OrderAttributes | null> => {
+		try {
+			const newOrder = await Order.create({
+				customerId,
+				staffId,
+				statusId,
+				billingAddress,
+				billingAddressCity,
+				billingAddressPostCode,
+				deliveryMethod,
+				deliveryDate,
+				couponId,
+			});
+
+			if (orderItems.length > 0) {
+				await OrderItem.bulkCreate(
+					orderItems.map((orderItem) => ({
+						...orderItem,
+						orderId: newOrder.orderId,
+					})),
+				);
+			}
+
+			if (payments.length > 0) {
+				await PaymentDetails.bulkCreate(
+					payments.map((payments) => ({
+						...payments,
+						orderId: newOrder.orderId,
+					})),
+				);
+			}
+
+			return newOrder ? newOrder.toJSON() : null;
+		} catch (err: any) {
+			console.error("Error occurred while creating order: ", err.message);
+			throw err;
+		}
+	};
+
+	getOrderById = async (
+		orderId: number,
+	): Promise<Order | OrderAttributes | null> => {
+		try {
+			const order = await Order.findByPk(orderId);
+
+			return order ? order.toJSON() : null;
+		} catch (err: any) {
+			console.error(
+				"Error occurred while fetching order by id: ",
+				err.message,
+			);
+			throw err;
+		}
+	};
+
+	// updateOrder = async (
 	// 	statusId: number,
-	// 	staffId?: number,
-	// ): Promise<Order | OrderAttributes | null> => {
-	// 	try {
-	// 		if (!staffId) {
-	// 			const randomStaff =
-	// 				await this.staffService.getRandomActiveStaff();
-	// 			staffId = randomStaff?.staffId;
-	// 		}
-	// 		//  const newOrder = {
-	// 		//     customerId,
-	// 		//     statusId,
-	// 		//     staffId;
-	// 		// }
-
-	// 		// TODO: CLEANUP THIS THING
-
-	// 		// if (attributes.length > 0) {
-	// 		// 	await ProductAttributes.bulkCreate(
-	// 		// 		attributes.map((attr) => ({
-	// 		// 			...attr,
-	// 		// 			productId: product.productId,
-	// 		// 		})),
-	// 		// 	);
-	// 		// }
-
-	// 		// // Create bulk discounts
-	// 		// if (bulkDiscounts.length > 0) {
-	// 		// 	await ProductBulkDiscount.bulkCreate(
-	// 		// 		bulkDiscounts.map((discount) => ({
-	// 		// 			...discount,
-	// 		// 			productId: product.productId,
-	// 		// 		})),
-	// 		// 	);
-	// 		// }
-
-	// 		// // Create images
-	// 		// if (images.length > 0) {
-	// 		// 	await ProductImage.bulkCreate(
-	// 		// 		images.map((img) => ({
-	// 		// 			...img,
-	// 		// 			productId: product.productId,
-	// 		// 		})),
-	// 		// 	);
-	// 		// }
-
-	// 		return product ? product.toJSON() : null;
-	// 	} catch (err: any) {
-	// 		console.error(
-	// 			"Error occurred while creating product: ",
-	// 			err.message,
-	// 		);
-	// 		throw err;
-	// 	}
-	// };
-
-	// getProductById = async (
-	// 	productId: number,
-	// ): Promise<ProductModelAttributes | null> => {
-	// 	try {
-	// 		const product = await Product.findByPk(productId, {
-	// 			include: [
-	// 				{ model: ProductAttributes, as: "attributes" },
-	// 				{ model: ProductBulkDiscount, as: "bulkDiscounts" },
-	// 				{ model: ProductImage, as: "images" },
-	// 			],
-	// 		});
-
-	// 		return product ? product.toJSON() : null;
-	// 	} catch (err: any) {
-	// 		console.error(
-	// 			"Error occurred while fetching product by id: ",
-	// 			err.message,
-	// 		);
-	// 		throw err;
-	// 	}
-	// };
-
-	// updateProduct = async (
-	// 	productId: number,
-	// 	updateData: Partial<ProductModelCreationAttributes>,
+	// 	orderItems: OrderItemCreationAttributes[],
+	// 	payments: PaymentDetailsCreationAttributes[],
 	// ): Promise<boolean> => {
 	// 	try {
+
 	// 		const [updatedRows] = await Product.update(updateData, {
 	// 			where: { productId },
 	// 		});
@@ -105,7 +147,7 @@ class OrderService {
 	// 	}
 	// };
 
-	// deleteProduct = async (productId: number): Promise<boolean> => {
+	// deleteOrder = async (productId: number): Promise<boolean> => {
 	// 	try {
 	// 		const product = await Product.findByPk(productId);
 	// 		if (product) {
@@ -122,84 +164,57 @@ class OrderService {
 	// 	}
 	// };
 
-	// getAllProducts = async (
-	// 	filter: WhereOptions<ProductModelAttributes>,
-	// 	limit: number,
-	// 	offset: number,
-	// 	order: Order,
-	// ): Promise<Product[] | ProductModelAttributes[] | null> => {
-	// 	try {
-	// 		const products = await Product.findAll({
-	// 			where: filter,
-	// 			limit,
-	// 			offset,
-	// 			order,
-	// 			include: [
-	// 				{ model: ProductAttributes, as: "attributes" },
-	// 				{ model: ProductBulkDiscount, as: "bulkDiscounts" },
-	// 				{ model: ProductImage, as: "images" },
-	// 			],
-	// 		});
+	getAllOrderStatuses = async (
+		filter: WhereOptions<OrderStatus>,
+		limit: number,
+		offset: number,
+		order: SequelizeOrder,
+	): Promise<OrderStatus[] | OrderStatusAttributes[] | null> => {
+		try {
+			const orderStatuses = await OrderStatus.findAll({
+				where: filter,
+				limit,
+				offset,
+				order,
+			});
 
-	// 		return products.map((product) => product.toJSON());
-	// 	} catch (err: any) {
-	// 		console.error(
-	// 			"Error occurred while fetching products: ",
-	// 			err.message,
-	// 		);
-	// 		throw err;
-	// 	}
-	// };
+			return orderStatuses.map((product) => product.toJSON());
+		} catch (err: any) {
+			console.error(
+				"Error occurred while fetching orders: ",
+				err.message,
+			);
+			throw err;
+		}
+	};
 
-	// addProductImage = async (
-	// 	imageName: string,
-	// 	productId: number,
-	// ): Promise<boolean> => {
-	// 	try {
-	// 		await ProductImage.create({ imageName, productId });
-	// 		return true;
-	// 	} catch (err: any) {
-	// 		console.error(
-	// 			"Error occurred while adding product image: ",
-	// 			err.message,
-	// 		);
-	// 		throw err;
-	// 	}
-	// };
+	getAllOrders = async (
+		filter: WhereOptions<OrderAttributes>,
+		limit: number,
+		offset: number,
+		order: SequelizeOrder,
+	): Promise<Order[] | OrderAttributes[] | null> => {
+		try {
+			const orders = await Order.findAll({
+				where: filter,
+				limit,
+				offset,
+				order,
+				include: [
+					{ model: OrderItem, as: "orderItems" },
+					{ model: PaymentDetails, as: "payments" },
+				],
+			});
 
-	// removeProductImage = async (imageId: number): Promise<boolean> => {
-	// 	try {
-	// 		const image = await ProductImage.findByPk(imageId);
-	// 		if (image) {
-	// 			await image.destroy();
-	// 			return true;
-	// 		}
-	// 		return false;
-	// 	} catch (err: any) {
-	// 		console.error(
-	// 			"Error occurred while deleting product image: ",
-	// 			err.message,
-	// 		);
-	// 		throw err;
-	// 	}
-	// };
-
-	// generateUniqueSKU = async (): Promise<string> => {
-	// 	let sku: string;
-	// 	let exists: Product | null;
-
-	// 	do {
-	// 		const randomString = crypto
-	// 			.randomBytes(3)
-	// 			.toString("hex")
-	// 			.toUpperCase()
-	// 			.slice(0, 6);
-	// 		sku = `DPM-${randomString}`;
-	// 		exists = await Product.findOne({ where: { sku } });
-	// 	} while (exists);
-
-	// 	return sku;
-	// };
+			return orders.map((product) => product.toJSON());
+		} catch (err: any) {
+			console.error(
+				"Error occurred while fetching orders: ",
+				err.message,
+			);
+			throw err;
+		}
+	};
 }
 
 export default OrderService;

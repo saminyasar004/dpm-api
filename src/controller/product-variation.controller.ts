@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import { responseSender } from "@/util";
-import ProductVariationService from "@/service/product-variation.service";
+import { responseSender } from "../util";
+import ProductVariationService from "../service/product-variation.service";
 import { Op, Order, WhereOptions } from "sequelize";
-import { VariationAttributes } from "@/model/variation.model";
+import { VariationAttributes } from "../model/variation.model";
 
 class ProductVariationController {
 	private productVariationService: ProductVariationService;

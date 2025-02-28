@@ -1,5 +1,5 @@
-import Faq, { FaqAttributes } from "@/model/faq.model";
-import FaqItem, { FaqItemAttributes } from "@/model/faq-item.model";
+import Faq, { FaqAttributes } from "../model/faq.model";
+import FaqItem, { FaqItemAttributes } from "../model/faq-item.model";
 import { Order, WhereOptions } from "sequelize";
 
 class FaqService {

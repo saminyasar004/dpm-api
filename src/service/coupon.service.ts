@@ -1,5 +1,4 @@
-import Coupon, { CouponAttributes } from "@/model/coupon.model";
-import ProductCategory from "@/model/product-category.model";
+import Coupon, { CouponAttributes } from "../model/coupon.model";
 import { Op, Order, WhereOptions } from "sequelize";
 
 class CouponService {

@@ -1,4 +1,4 @@
-import Newsletter, { NewsletterAttributes } from "@/model/newsletter.model";
+import Newsletter, { NewsletterAttributes } from "../model/newsletter.model";
 import { Order, WhereOptions } from "sequelize";
 
 class NewsletterService {

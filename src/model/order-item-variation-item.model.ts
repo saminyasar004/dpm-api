@@ -7,13 +7,10 @@ import {
 	AutoIncrement,
 	ForeignKey,
 	BelongsTo,
-	BelongsToMany,
 } from "sequelize-typescript";
-import Variation from "./variation.model";
-import Product from "./product.model";
-import ProductVariationItem from "./product-variation-item.model";
+import OrderItemVariation from "./order-item-variation.model";
 
-export interface VariationItemAttributes {
+export interface OrderItemVariationItemAttributes {
 	variationItemId: number;
 	value: string;
 	additionalPrice: number;
@@ -22,16 +19,16 @@ export interface VariationItemAttributes {
 	updatedAt: Date;
 }
 
-export interface VariationItemCreationAttributes {
+export interface OrderItemVariationItemCreationAttributes {
 	value: string;
 	additionalPrice: number;
 	variationId: number;
 }
 
-@Table({ tableName: "VariationItem", timestamps: true })
-class VariationItem extends Model<
-	VariationItemAttributes,
-	VariationItemCreationAttributes
+@Table({ tableName: "OrderItemVariationItem", timestamps: true })
+class OrderItemVariationItem extends Model<
+	OrderItemVariationItemAttributes,
+	OrderItemVariationItemCreationAttributes
 > {
 	@PrimaryKey
 	@AutoIncrement
@@ -44,15 +41,12 @@ class VariationItem extends Model<
 	@Column({ type: DataType.FLOAT, defaultValue: 0 })
 	declare additionalPrice: number;
 
-	@ForeignKey(() => Variation)
+	@ForeignKey(() => OrderItemVariation)
 	@Column({ type: DataType.INTEGER, allowNull: false })
 	declare variationId: number;
 
-	@BelongsTo(() => Variation)
-	declare variation: Variation;
-
-	@BelongsToMany(() => Product, () => ProductVariationItem)
-	declare product?: Product;
+	@BelongsTo(() => OrderItemVariation)
+	declare variation: OrderItemVariation;
 }
 
-export default VariationItem;
+export default OrderItemVariationItem;
